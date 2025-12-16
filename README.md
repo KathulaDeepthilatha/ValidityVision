@@ -52,8 +52,7 @@ Follow these steps to get the project running on your local machine.
 
 1.  **Clone the repository** (or download the files):
     ```bash
-    git clone https://github.com/ramii17/Agentathon
-    cd validity-vision
+    git clone https://github.com/ramii17/Agentathon_ValidityVision
     ```
 
 2.  **Install dependencies**:
