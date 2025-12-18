@@ -52,44 +52,38 @@ const Home: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="group p-8 rounded-[2rem] bg-surface-card-light dark:bg-surface-card-dark border border-slate-100 dark:border-slate-800 shadow-card hover:shadow-hover hover:-translate-y-2 transition-all duration-500 relative overflow-hidden animate-fade-in">
             <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary/10 to-transparent rounded-bl-[4rem] transition-transform group-hover:scale-110"></div>
-            <div className="w-14 h-14 bg-indigo-50 dark:bg-indigo-900/30 rounded-2xl flex items-center justify-center text-primary mb-6 group-hover:scale-110 transition-transform duration-300">
-              <span className="material-symbols-outlined text-3xl">verified_user</span>
+            <div className="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/30 rounded-2xl flex items-center justify-center text-primary mb-6 group-hover:scale-110 transition-transform duration-300">
+              <span className="material-symbols-outlined text-2xl">verified_user</span>
             </div>
             <h3 className="text-xl font-bold text-text-main-light dark:text-text-main-dark mb-3">Safety Analysis</h3>
             <p className="text-text-secondary-light dark:text-text-secondary-dark text-sm leading-relaxed">
               Instant ingredient breakdown for food and cosmetics. Know what's safe for your family with a simple scan.
             </p>
-            <a className="inline-flex items-center gap-1 text-primary text-sm font-bold mt-6 group-hover:translate-x-1 transition-transform" href="#">
-              Analyze now <span className="material-symbols-outlined text-lg">arrow_forward</span>
-            </a>
+
           </div>
 
           <div className="group p-8 rounded-[2rem] bg-surface-card-light dark:bg-surface-card-dark border border-slate-100 dark:border-slate-800 shadow-card hover:shadow-hover hover:-translate-y-2 transition-all duration-500 relative overflow-hidden animate-fade-in" style={{ animationDelay: '200ms' }}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-accent-orange/10 to-transparent rounded-bl-[4rem] transition-transform group-hover:scale-110"></div>
-            <div className="w-14 h-14 bg-orange-50 dark:bg-orange-900/30 rounded-2xl flex items-center justify-center text-accent-orange mb-6 group-hover:scale-110 transition-transform duration-300">
-              <span className="material-symbols-outlined text-3xl">timer</span>
+            <div className="w-12 h-12 bg-orange-50 dark:bg-orange-900/30 rounded-2xl flex items-center justify-center text-accent-orange mb-6 group-hover:scale-110 transition-transform duration-300">
+              <span className="material-symbols-outlined text-2xl">timer</span>
             </div>
             <h3 className="text-xl font-bold text-text-main-light dark:text-text-main-dark mb-3">Expiry Tracking</h3>
             <p className="text-text-secondary-light dark:text-text-secondary-dark text-sm leading-relaxed">
               Never let good products go to waste. Get smart notifications before your groceries or serums expire.
             </p>
-            <a className="inline-flex items-center gap-1 text-accent-orange text-sm font-bold mt-6 group-hover:translate-x-1 transition-transform" href="#">
-              Check timeline <span className="material-symbols-outlined text-lg">arrow_forward</span>
-            </a>
+
           </div>
 
           <div className="group p-8 rounded-[2rem] bg-surface-card-light dark:bg-surface-card-dark border border-slate-100 dark:border-slate-800 shadow-card hover:shadow-hover hover:-translate-y-2 transition-all duration-500 relative overflow-hidden animate-fade-in" style={{ animationDelay: '400ms' }}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-green-500/10 to-transparent rounded-bl-[4rem] transition-transform group-hover:scale-110"></div>
-            <div className="w-14 h-14 bg-green-50 dark:bg-green-900/30 rounded-2xl flex items-center justify-center text-green-500 mb-6 group-hover:scale-110 transition-transform duration-300">
-              <span className="material-symbols-outlined text-3xl">category</span>
+            <div className="w-12 h-12 bg-green-50 dark:bg-green-900/30 rounded-2xl flex items-center justify-center text-green-500 mb-6 group-hover:scale-110 transition-transform duration-300">
+              <span className="material-symbols-outlined text-2xl">category</span>
             </div>
             <h3 className="text-xl font-bold text-text-main-light dark:text-text-main-dark mb-3">Universal Support</h3>
             <p className="text-text-secondary-light dark:text-text-secondary-dark text-sm leading-relaxed">
               From pantry staples to bathroom luxuries. Organize your entire household inventory in one beautiful place.
             </p>
-            <a className="inline-flex items-center gap-1 text-green-500 text-sm font-bold mt-6 group-hover:translate-x-1 transition-transform" href="#">
-              Browse categories <span className="material-symbols-outlined text-lg">arrow_forward</span>
-            </a>
+
           </div>
         </div>
       </div>

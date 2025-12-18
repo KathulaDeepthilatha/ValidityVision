@@ -1,6 +1,63 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 const Settings: React.FC = () => {
+    // State for profile
+    const [displayName, setDisplayName] = useState("Nani");
+    const [bio, setBio] = useState("Food enthusiast & sustainability advocate.");
+
+    // State for preferences
+    const [preferences, setPreferences] = useState({
+        pushNotifications: true,
+        weeklyDigest: false,
+        soundEffects: true
+    });
+
+    // State for security
+    const [passwords, setPasswords] = useState({
+        new: "",
+        confirm: ""
+    });
+
+    // Handlers
+    const handlePreferenceChange = (key: keyof typeof preferences) => {
+        setPreferences(prev => ({
+            ...prev,
+            [key]: !prev[key]
+        }));
+    };
+
+    const handlePasswordChange = (key: keyof typeof passwords, value: string) => {
+        setPasswords(prev => ({
+            ...prev,
+            [key]: value
+        }));
+    };
+
+    const handleSave = () => {
+        if (passwords.new || passwords.confirm) {
+            if (passwords.new !== passwords.confirm) {
+                alert("Passwords do not match!");
+                return;
+            }
+            if (passwords.new.length < 8) {
+                alert("Password must be at least 8 characters.");
+                return;
+            }
+        }
+
+        // Simulate API call
+        console.log("Saving settings:", { displayName, bio, preferences, passwordUpdated: !!passwords.new });
+        alert("Settings saved successfully!");
+        setPasswords({ new: "", confirm: "" });
+    };
+
+    const handleDeleteAccount = () => {
+        if (window.confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
+            alert("Account deletion scheduled. We're sad to see you go!");
+            // In a real app, this would trigger a deletion API call and logout
+        }
+    };
+
     return (
         <div className="flex-1 flex flex-col h-full relative overflow-hidden bg-background-light dark:bg-background-dark transition-colors duration-500 z-10">
             <header className="w-full px-4 md:px-10 py-6 md:py-8 flex flex-col md:flex-row justify-between items-start md:items-end shrink-0 z-20 relative animate-fade-in gap-4">
@@ -13,7 +70,10 @@ const Settings: React.FC = () => {
                         <span className="material-symbols-outlined text-[20px] group-hover:text-primary transition-colors">help</span>
                         Help
                     </button>
-                    <button className="bg-primary hover:bg-primary-dark text-white shadow-lg shadow-primary/30 rounded-xl px-6 py-2.5 text-sm font-bold transition-all hover:scale-105 active:scale-95 flex items-center gap-2 group relative overflow-hidden">
+                    <button
+                        onClick={handleSave}
+                        className="bg-primary hover:bg-primary-dark text-white shadow-lg shadow-primary/30 rounded-xl px-6 py-2.5 text-sm font-bold transition-all hover:scale-105 active:scale-95 flex items-center gap-2 group relative overflow-hidden"
+                    >
                         <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                         <span className="material-symbols-outlined text-[20px] relative z-10">save</span>
                         <span className="relative z-10">Save Changes</span>
@@ -36,7 +96,7 @@ const Settings: React.FC = () => {
                                         <span className="material-symbols-outlined text-[18px] group-hover/btn:rotate-90 transition-transform duration-300">edit</span>
                                     </button>
                                 </div>
-                                <h3 className="text-xl font-bold text-text-main-light dark:text-text-main-dark mb-1">Nani</h3>
+                                <h3 className="text-xl font-bold text-text-main-light dark:text-text-main-dark mb-1">{displayName || 'User'}</h3>
                                 <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark mb-6">nani@validityvision.com</p>
                                 <div className="w-full space-y-4">
                                     <div className="input-group group text-left">
@@ -47,7 +107,13 @@ const Settings: React.FC = () => {
                                                     <span className="material-symbols-outlined text-[20px]">badge</span>
                                                 </div>
                                             </div>
-                                            <input className="block w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-300 shadow-inner-glow dark:text-white" placeholder="Enter your name" type="text" defaultValue="Nani" />
+                                            <input
+                                                className="block w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-300 shadow-inner-glow dark:text-white"
+                                                placeholder="Enter your name"
+                                                type="text"
+                                                value={displayName}
+                                                onChange={(e) => setDisplayName(e.target.value)}
+                                            />
                                         </div>
                                     </div>
                                     <div className="input-group group text-left">
@@ -58,7 +124,13 @@ const Settings: React.FC = () => {
                                                     <span className="material-symbols-outlined text-[20px]">description</span>
                                                 </div>
                                             </div>
-                                            <textarea className="block w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-300 shadow-inner-glow dark:text-white resize-none" placeholder="A brief description..." rows={3} defaultValue="Food enthusiast & sustainability advocate."></textarea>
+                                            <textarea
+                                                className="block w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-300 shadow-inner-glow dark:text-white resize-none"
+                                                placeholder="A brief description..."
+                                                rows={3}
+                                                value={bio}
+                                                onChange={(e) => setBio(e.target.value)}
+                                            ></textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -116,7 +188,12 @@ const Settings: React.FC = () => {
                                         </div>
                                     </div>
                                     <label className="relative inline-flex items-center cursor-pointer">
-                                        <input type="checkbox" className="sr-only peer" defaultChecked />
+                                        <input
+                                            type="checkbox"
+                                            className="sr-only peer"
+                                            checked={preferences.pushNotifications}
+                                            onChange={() => handlePreferenceChange('pushNotifications')}
+                                        />
                                         <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/30 dark:peer-focus:ring-primary/30 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
                                     </label>
                                 </div>
@@ -132,7 +209,12 @@ const Settings: React.FC = () => {
                                         </div>
                                     </div>
                                     <label className="relative inline-flex items-center cursor-pointer">
-                                        <input type="checkbox" className="sr-only peer" />
+                                        <input
+                                            type="checkbox"
+                                            className="sr-only peer"
+                                            checked={preferences.weeklyDigest}
+                                            onChange={() => handlePreferenceChange('weeklyDigest')}
+                                        />
                                         <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/30 dark:peer-focus:ring-primary/30 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
                                     </label>
                                 </div>
@@ -148,7 +230,12 @@ const Settings: React.FC = () => {
                                         </div>
                                     </div>
                                     <label className="relative inline-flex items-center cursor-pointer">
-                                        <input type="checkbox" className="sr-only peer" defaultChecked />
+                                        <input
+                                            type="checkbox"
+                                            className="sr-only peer"
+                                            checked={preferences.soundEffects}
+                                            onChange={() => handlePreferenceChange('soundEffects')}
+                                        />
                                         <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/30 dark:peer-focus:ring-primary/30 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
                                     </label>
                                 </div>
@@ -175,7 +262,13 @@ const Settings: React.FC = () => {
                                                 <span className="material-symbols-outlined text-[20px]">key</span>
                                             </div>
                                         </div>
-                                        <input className="block w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-300 shadow-inner-glow dark:text-white" placeholder="••••••••" type="password" />
+                                        <input
+                                            className="block w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-300 shadow-inner-glow dark:text-white"
+                                            placeholder="••••••••"
+                                            type="password"
+                                            value={passwords.new}
+                                            onChange={(e) => handlePasswordChange('new', e.target.value)}
+                                        />
                                     </div>
                                 </div>
                                 <div className="input-group group text-left">
@@ -186,22 +279,15 @@ const Settings: React.FC = () => {
                                                 <span className="material-symbols-outlined text-[20px]">check</span>
                                             </div>
                                         </div>
-                                        <input className="block w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-300 shadow-inner-glow dark:text-white" placeholder="••••••••" type="password" />
+                                        <input
+                                            className="block w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-300 shadow-inner-glow dark:text-white"
+                                            placeholder="••••••••"
+                                            type="password"
+                                            value={passwords.confirm}
+                                            onChange={(e) => handlePasswordChange('confirm', e.target.value)}
+                                        />
                                     </div>
                                 </div>
-                            </div>
-
-                            <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800">
-                                <div className="flex items-center gap-4">
-                                    <div className="p-2.5 bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 text-primary">
-                                        <span className="material-symbols-outlined">phonelink_lock</span>
-                                    </div>
-                                    <div>
-                                        <h4 className="text-sm font-bold text-text-main-light dark:text-text-main-dark">Two-Factor Authentication</h4>
-                                        <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark">Add an extra layer of security</p>
-                                    </div>
-                                </div>
-                                <button className="text-primary text-sm font-bold hover:underline">Enable</button>
                             </div>
                         </div>
 
@@ -216,7 +302,10 @@ const Settings: React.FC = () => {
                                         <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark max-w-md">Once you delete your account, there is no going back. Please be certain.</p>
                                     </div>
                                 </div>
-                                <button className="px-6 py-3 rounded-xl bg-white dark:bg-slate-800 text-danger border border-red-200 dark:border-red-900/50 hover:bg-red-500 hover:text-white transition-all text-sm font-bold shadow-sm hover:shadow-lg hover:shadow-red-500/30 whitespace-nowrap active:scale-95">
+                                <button
+                                    onClick={handleDeleteAccount}
+                                    className="px-6 py-3 rounded-xl bg-white dark:bg-slate-800 text-danger border border-red-200 dark:border-red-900/50 hover:bg-red-500 hover:text-white transition-all text-sm font-bold shadow-sm hover:shadow-lg hover:shadow-red-500/30 whitespace-nowrap active:scale-95"
+                                >
                                     Delete Account
                                 </button>
                             </div>
