@@ -16,7 +16,7 @@ const Home: React.FC = () => {
             </span>
             <span className="text-xs font-bold text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-widest">ValidityVision 2.0 is Live</span>
           </div>
-          <h1 className="text-6xl md:text-7xl font-black text-text-main-light dark:text-text-main-dark leading-tight tracking-tight mb-6 animate-slide-up" style={{ animationDelay: '200ms' }}>
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-text-main-light dark:text-text-main-dark leading-tight tracking-tight mb-6 animate-slide-up" style={{ animationDelay: '200ms' }}>
             Know Your Pantry,<br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary-dark dark:from-primary-soft dark:to-primary" style={{ textShadow: '0 0 20px rgba(99, 102, 241, 0.3)' }}>Trust Your Safety.</span>
           </h1>
@@ -48,7 +48,7 @@ const Home: React.FC = () => {
         </div>
       </div>
 
-      <div className="px-12 pb-20 max-w-7xl mx-auto">
+      <div className="px-4 md:px-12 pb-20 max-w-7xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="group p-8 rounded-[2rem] bg-surface-card-light dark:bg-surface-card-dark border border-slate-100 dark:border-slate-800 shadow-card hover:shadow-hover hover:-translate-y-2 transition-all duration-500 relative overflow-hidden animate-fade-in">
             <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary/10 to-transparent rounded-bl-[4rem] transition-transform group-hover:scale-110"></div>
@@ -94,7 +94,7 @@ const Home: React.FC = () => {
         </div>
       </div>
 
-      <div className="px-12 pb-16 max-w-7xl mx-auto w-full animate-slide-up" style={{ animationDelay: '500ms' }}>
+      <div className="px-4 md:px-12 pb-16 max-w-7xl mx-auto w-full animate-slide-up" style={{ animationDelay: '500ms' }}>
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-2xl font-bold text-text-main-light dark:text-text-main-dark">Quick Stats</h2>
           <button onClick={() => navigate('/inventory')} className="text-sm font-medium text-primary hover:text-primary-hover transition-colors">View Inventory</button>

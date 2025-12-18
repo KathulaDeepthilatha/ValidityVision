@@ -24,7 +24,7 @@ const Onboarding: React.FC = () => {
           </button>
         </div>
       </nav>
-      
+
       <main className="flex-grow container mx-auto px-4 lg:px-8 py-4 lg:py-8 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-center">
         <div className="hidden lg:block lg:col-span-5 h-[calc(100vh-140px)] min-h-[600px] relative rounded-3xl overflow-hidden shadow-2xl shadow-indigo-200 dark:shadow-black/50 animate-slide-up" style={{ animationDelay: '0.1s' }}>
           <img alt="Hand scanning groceries with smartphone" className="absolute inset-0 w-full h-full object-cover transition-transform duration-[20s] hover:scale-110 ease-linear" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCLop_icuqrVLDxqtGlnBMYaLMY8c-eGCTEe5y7e6alJ9QQAtSx7Rfuw1787Ub6fa23eMXar6s55h4VVzVOLL64SzGwVvSLlYMy57gn8RvFEbg3uVFpEeSfDUG8gZPTtVZ2E3DZzS7HEM1r-KWlaCaHQuvh34FM2vEujlHobSx8Paut8rcvfsNQ3kORKZDELu9B0rE24oyRA1uuSkEQAYwQIKhkKbhOEI8IgfN2Z9ivrKvASdoQmOJ2WlQXrmJsvnBDQAg-JVfPIA8" />
@@ -43,7 +43,7 @@ const Onboarding: React.FC = () => {
             </p>
           </div>
         </div>
-        
+
         <div className="lg:col-span-7 flex flex-col justify-center max-w-2xl mx-auto lg:mx-0 w-full animate-slide-up" style={{ animationDelay: '0.2s' }}>
           <header className="mb-10">
             <h2 className="text-4xl md:text-5xl font-extrabold text-slate-900 dark:text-white mb-4 tracking-tight">
@@ -53,7 +53,7 @@ const Onboarding: React.FC = () => {
               Seamlessly connect your WhatsApp activity to your personal dashboard to get started.
             </p>
           </header>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
             <div onClick={handleSignIn} className="group p-6 rounded-2xl bg-white dark:bg-surface-dark border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-md hover:border-slate-300 dark:hover:border-slate-600 transition-all cursor-pointer relative overflow-hidden">
               <div className="absolute top-0 right-0 p-4 opacity-50 group-hover:opacity-100 transition-opacity">
@@ -65,7 +65,7 @@ const Onboarding: React.FC = () => {
                 Create Account
               </button>
             </div>
-            
+
             <div onClick={handleSignIn} className="group p-6 rounded-2xl bg-indigo-50/50 dark:bg-indigo-900/10 border-2 border-primary/30 dark:border-primary/20 shadow-sm hover:shadow-md hover:border-primary transition-all cursor-pointer relative">
               <div className="absolute top-0 right-0 p-4">
                 <span className="material-icons-round text-primary text-4xl group-hover:scale-110 transition-transform">whatsapp</span>
@@ -80,13 +80,13 @@ const Onboarding: React.FC = () => {
               </div>
             </div>
           </div>
-          
+
           <div className="relative flex py-2 items-center mb-8">
             <div className="flex-grow border-t border-slate-200 dark:border-slate-700"></div>
             <span className="flex-shrink-0 mx-4 text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Or quick link via phone</span>
             <div className="flex-grow border-t border-slate-200 dark:border-slate-700"></div>
           </div>
-          
+
           <form className="space-y-4 mb-8" onSubmit={(e) => { e.preventDefault(); handleSignIn(); }}>
             <div className="grid grid-cols-12 gap-4">
               <div className="col-span-3">
@@ -107,12 +107,12 @@ const Onboarding: React.FC = () => {
               <span className="material-icons-round text-base mt-0.5">info</span>
               <p>We will send a one-time verification code to your WhatsApp.</p>
             </div>
-            <button className="w-full bg-primary hover:bg-primary-hover active:bg-indigo-700 text-white font-bold text-lg py-4 rounded-xl shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2 group" type="submit">
+            <button className="w-full bg-primary hover:bg-primary-hover active:bg-indigo-700 text-white font-bold text-lg py-4 rounded-xl shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all transform hover:-translate-y-0.5 flex flex-col sm:flex-row items-center justify-center gap-2 group" type="submit">
               Send Verification Code
               <span className="material-icons-round group-hover:translate-x-1 transition-transform">arrow_forward</span>
             </button>
           </form>
-          
+
           <div className="flex flex-wrap gap-x-8 gap-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
             <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400 text-sm font-medium">
               <span className="material-icons-round text-primary text-lg">verified_user</span>

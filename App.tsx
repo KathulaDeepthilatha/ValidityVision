@@ -8,15 +8,30 @@ import ScanProduct from './pages/ScanProduct';
 import ScanResult from './pages/ScanResult';
 import Settings from './pages/Settings';
 
+// Context for Sidebar state
+export interface SidebarContextType {
+  isMobileMenuOpen: boolean;
+  toggleMobileMenu: () => void;
+}
+export const SidebarContext = React.createContext<SidebarContextType>({
+  isMobileMenuOpen: false,
+  toggleMobileMenu: () => { }
+});
+
 // A layout wrapper for authenticated pages
 const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
+  const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
+
   return (
-    <div className="flex h-screen overflow-hidden bg-background-light dark:bg-background-dark text-text-main-light dark:text-text-main-dark transition-colors duration-300">
-      <Sidebar />
-      <main className="flex-1 flex flex-col h-full relative overflow-hidden transition-colors duration-300 z-10">
-        {children}
-      </main>
-    </div>
+    <SidebarContext.Provider value={{ isMobileMenuOpen, toggleMobileMenu }}>
+      <div className="flex h-screen overflow-hidden bg-background-light dark:bg-background-dark text-text-main-light dark:text-text-main-dark transition-colors duration-300">
+        <Sidebar isMobileMenuOpen={isMobileMenuOpen} setIsMobileMenuOpen={setIsMobileMenuOpen} />
+        <main className="flex-1 flex flex-col h-full relative overflow-hidden transition-colors duration-300 z-10">
+          {children}
+        </main>
+      </div>
+    </SidebarContext.Provider>
   );
 };
 
