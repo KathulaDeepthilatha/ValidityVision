@@ -131,8 +131,44 @@ const ScanProduct: React.FC = () => {
         };
     }, []);
 
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const handleUploadClick = () => {
+        fileInputRef.current?.click();
+    };
+
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                const imageDataUrl = reader.result as string;
+                setCapturedImage(imageDataUrl);
+                stopCamera();
+
+                if (scanStep === 'front-scan') {
+                    setScanStep('front-review');
+                } else if (scanStep === 'back-scan') {
+                    setScanStep('back-review');
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+        // Reset input value to allow selecting same file again
+        if (event.target) {
+            event.target.value = '';
+        }
+    };
+
     return (
         <div className="flex-1 flex flex-col h-full bg-background-light dark:bg-background-dark overflow-hidden relative">
+            <input
+                type="file"
+                ref={fileInputRef}
+                className="hidden"
+                accept="image/*"
+                onChange={handleFileChange}
+            />
             <header className="w-full px-10 py-8 flex justify-between items-end shrink-0 z-20 relative animate-fade-in">
                 <div className="flex flex-col gap-2">
                     <div className="flex items-center gap-3">
@@ -230,11 +266,13 @@ const ScanProduct: React.FC = () => {
                                     </button>
                                 </>
                             ) : (
-                                <button className="group relative flex items-center justify-center gap-3 py-4 px-12 rounded-full bg-white dark:bg-surface-card-dark border border-slate-200 dark:border-slate-700 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all overflow-hidden w-full md:w-auto min-w-[280px]">
+                                <button onClick={handleUploadClick} className="group relative flex items-center justify-center gap-3 py-4 px-12 rounded-full bg-white dark:bg-surface-card-dark border border-slate-200 dark:border-slate-700 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all overflow-hidden w-full md:w-auto min-w-[280px]">
                                     <div className="absolute inset-0 bg-primary/5 dark:bg-primary/10 scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500"></div>
                                     <span className="material-symbols-outlined text-2xl text-primary group-hover:scale-110 group-hover:rotate-12 transition-transform duration-300">add_photo_alternate</span>
                                     <div className="flex flex-col items-start">
-                                        <span className="text-text-main-light dark:text-text-main-dark font-bold text-base">Upload Image</span>
+                                        <span className="text-text-main-light dark:text-text-main-dark font-bold text-base">
+                                            {scanStep === 'back-scan' ? 'Upload Back' : 'Upload Front'}
+                                        </span>
                                         <span className="text-text-secondary-light dark:text-text-secondary-dark text-[10px] uppercase tracking-wider">From Gallery</span>
                                     </div>
                                 </button>

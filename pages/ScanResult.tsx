@@ -1,8 +1,16 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const ScanResult: React.FC = () => {
     const navigate = useNavigate();
+    const location = useLocation();
+    const { frontImage, backImage } = location.state || {}; // Retrieve images from state
+    const [activeView, setActiveView] = useState<'front' | 'back'>('front');
+
+    // Determine the image to show. Default to dynamic frontImage, fallback to static if missing.
+    const displayImage = activeView === 'front'
+        ? (frontImage || "https://lh3.googleusercontent.com/aida-public/AB6AXuBNFXHO5f6c8EtrXHfQPE0BQszR5UlL0HQEcqQdZtxAs-bW6Ikwr2DIR9uynLlpznJ0TKjOPF8XEroQK0GBEyZmCSOFZGZvzAjZSZ6WaRdXYZYgBjCbcPqb7Q5ub_8SvU2ovEL4jz_MqZWz8S1RjYI8eplc8eWTtRXd5Chf89cBYLyeoOWJLi3r18T-swZLAkLaUdsMxVXq_eAa6MJl8_kvqVPFzB_3P0hgRHRUGxWZyPvKtH0TMdzH2KGVSbNKWIEHZ8dI3T_sh3s")
+        : (backImage || frontImage || "https://lh3.googleusercontent.com/aida-public/AB6AXuBNFXHO5f6c8EtrXHfQPE0BQszR5UlL0HQEcqQdZtxAs-bW6Ikwr2DIR9uynLlpznJ0TKjOPF8XEroQK0GBEyZmCSOFZGZvzAjZSZ6WaRdXYZYgBjCbcPqb7Q5ub_8SvU2ovEL4jz_MqZWz8S1RjYI8eplc8eWTtRXd5Chf89cBYLyeoOWJLi3r18T-swZLAkLaUdsMxVXq_eAa6MJl8_kvqVPFzB_3P0hgRHRUGxWZyPvKtH0TMdzH2KGVSbNKWIEHZ8dI3T_sh3s");
 
     return (
         <div className="flex-1 flex flex-col h-full bg-background-light dark:bg-background-light relative overflow-y-auto">
@@ -17,8 +25,26 @@ const ScanResult: React.FC = () => {
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
                         <div className="lg:col-span-4 flex flex-col gap-6">
                             <div className="glass-panel rounded-2xl overflow-hidden shadow-glow border border-slate-200 group relative transition-transform duration-500 hover:scale-[1.01]">
-                                <div className="aspect-square w-full bg-cover bg-center relative" style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuBNFXHO5f6c8EtrXHfQPE0BQszR5UlL0HQEcqQdZtxAs-bW6Ikwr2DIR9uynLlpznJ0TKjOPF8XEroQK0GBEyZmCSOFZGZvzAjZSZ6WaRdXYZYgBjCbcPqb7Q5ub_8SvU2ovEL4jz_MqZWz8S1RjYI8eplc8eWTtRXd5Chf89cBYLyeoOWJLi3r18T-swZLAkLaUdsMxVXq_eAa6MJl8_kvqVPFzB_3P0hgRHRUGxWZyPvKtH0TMdzH2KGVSbNKWIEHZ8dI3T_sh3s")' }}>
+                                <div className="aspect-square w-full bg-cover bg-center relative" style={{ backgroundImage: `url("${displayImage}")` }}>
+
+                                    {/* Gradient Overlay */}
                                     <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/30 to-transparent"></div>
+
+                                    {/* Image Toggle Controls - Only show if we actually have images or are testing */}
+                                    <div className="absolute top-4 right-4 flex gap-2 z-20">
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); setActiveView('front'); }}
+                                            className={`px-3 py-1 rounded-full text-xs font-bold backdrop-blur-md transition-all ${activeView === 'front' ? 'bg-primary text-white shadow-lg' : 'bg-white/20 text-white/80 hover:bg-white/30'}`}
+                                        >
+                                            Front
+                                        </button>
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); setActiveView('back'); }}
+                                            className={`px-3 py-1 rounded-full text-xs font-bold backdrop-blur-md transition-all ${activeView === 'back' ? 'bg-primary text-white shadow-lg' : 'bg-white/20 text-white/80 hover:bg-white/30'}`}
+                                        >
+                                            Back
+                                        </button>
+                                    </div>
                                     <div className="absolute bottom-0 left-0 p-6 w-full">
                                         <p className="text-accent-purple text-xs font-bold uppercase tracking-wider mb-2 flex items-center gap-1">
                                             <span className="size-1.5 bg-accent-purple rounded-full animate-pulse"></span>
