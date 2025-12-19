@@ -3,9 +3,16 @@ import { useNavigate } from 'react-router-dom';
 
 const ScanProduct: React.FC = () => {
     const navigate = useNavigate();
+    const [scanStep, setScanStep] = useState<'front-scan' | 'front-review' | 'back-scan' | 'back-review' | 'completed'>('front-scan');
+    const [frontImage, setFrontImage] = useState<string | null>(null);
+    const [backImage, setBackImage] = useState<string | null>(null);
+
+    // UI State
     const [isCameraActive, setIsCameraActive] = useState(false);
-    const [capturedImage, setCapturedImage] = useState<string | null>(null);
+    const [capturedImage, setCapturedImage] = useState<string | null>(null); // Acts as tempImage
     const [error, setError] = useState<string | null>(null);
+    const [showRetakeModal, setShowRetakeModal] = useState(false);
+
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -59,12 +66,62 @@ const ScanProduct: React.FC = () => {
                 setCapturedImage(imageDataUrl);
                 stopCamera();
 
-                // Simulate processing delay then navigate
-                setTimeout(() => {
-                    navigate('/scan-result', { state: { image: imageDataUrl } });
-                }, 1500);
+                if (scanStep === 'front-scan') {
+                    setScanStep('front-review');
+                } else if (scanStep === 'back-scan') {
+                    setScanStep('back-review');
+                }
             }
         }
+    };
+
+    const handleConfirm = () => {
+        if (scanStep === 'front-review' && capturedImage) {
+            setFrontImage(capturedImage);
+            setCapturedImage(null);
+            setScanStep('back-scan');
+            startCamera();
+        } else if (scanStep === 'back-review' && capturedImage) {
+            setBackImage(capturedImage);
+            setScanStep('completed');
+            // Navigate with both images
+            navigate('/scan-result', { state: { frontImage: frontImage, backImage: capturedImage } });
+        }
+    };
+
+    const handleRetakeRequest = () => {
+        setShowRetakeModal(true);
+    };
+
+    const confirmRetake = () => {
+        setShowRetakeModal(false);
+        setCapturedImage(null);
+        if (scanStep === 'front-review') {
+            setScanStep('front-scan');
+        } else if (scanStep === 'back-review') {
+            setScanStep('back-scan');
+        }
+        startCamera();
+    };
+
+    const cancelRetake = () => {
+        setShowRetakeModal(false);
+    };
+
+    const getInstructionText = () => {
+        switch (scanStep) {
+            case 'front-scan': return "Position the front of the product in the frame.";
+            case 'front-review': return "Review the front image. Ensure text is readable.";
+            case 'back-scan': return "Now flip it over and scan the back/ingredients.";
+            case 'back-review': return "Review the back image. Ensure ingredients are clear.";
+            default: return "Processing...";
+        }
+    };
+
+    const getPageTitle = () => {
+        if (scanStep.includes('front')) return "Scan Front Side";
+        if (scanStep.includes('back')) return "Scan Back Side";
+        return "Scan Product";
     };
 
     // Cleanup on unmount
@@ -82,10 +139,10 @@ const ScanProduct: React.FC = () => {
                         <div className="p-2 bg-primary/10 dark:bg-primary/20 rounded-xl text-primary relative">
                             <span className="material-symbols-outlined">center_focus_strong</span>
                         </div>
-                        <h2 className="text-text-main-light dark:text-text-main-dark text-3xl font-black leading-tight tracking-[-0.03em]">Scan New Product</h2>
+                        <h2 className="text-text-main-light dark:text-text-main-dark text-3xl font-black leading-tight tracking-[-0.03em]">{getPageTitle()}</h2>
                     </div>
                     <p className="text-text-secondary-light dark:text-text-secondary-dark text-base font-normal">
-                        Scan both sides of the product.
+                        {getInstructionText()}
                     </p>
                 </div>
                 <div className="flex items-center gap-4">
@@ -153,15 +210,35 @@ const ScanProduct: React.FC = () => {
 
                         </div>
 
-                        <div className="flex justify-center mt-2">
-                            <button className="group relative flex items-center justify-center gap-3 py-4 px-12 rounded-full bg-white dark:bg-surface-card-dark border border-slate-200 dark:border-slate-700 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all overflow-hidden w-full md:w-auto min-w-[280px]">
-                                <div className="absolute inset-0 bg-primary/5 dark:bg-primary/10 scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500"></div>
-                                <span className="material-symbols-outlined text-2xl text-primary group-hover:scale-110 group-hover:rotate-12 transition-transform duration-300">add_photo_alternate</span>
-                                <div className="flex flex-col items-start">
-                                    <span className="text-text-main-light dark:text-text-main-dark font-bold text-base">Upload Image</span>
-                                    <span className="text-text-secondary-light dark:text-text-secondary-dark text-[10px] uppercase tracking-wider">From Gallery</span>
-                                </div>
-                            </button>
+                        {/* Controls / Actions */}
+                        <div className="flex justify-center mt-2 gap-4">
+                            {(scanStep === 'front-review' || scanStep === 'back-review') ? (
+                                <>
+                                    <button
+                                        onClick={handleRetakeRequest}
+                                        className="flex items-center justify-center gap-2 py-4 px-8 rounded-full bg-white dark:bg-surface-card-dark border border-slate-200 dark:border-slate-700 shadow-lg hover:shadow-xl hover:bg-slate-50 transition-all text-text-main-light dark:text-text-main-dark font-bold min-w-[150px]"
+                                    >
+                                        <span className="material-symbols-outlined">replay</span>
+                                        Retake
+                                    </button>
+                                    <button
+                                        onClick={handleConfirm}
+                                        className="flex items-center justify-center gap-2 py-4 px-8 rounded-full bg-primary text-white shadow-lg hover:shadow-xl hover:bg-primary-dark transition-all font-bold min-w-[150px]"
+                                    >
+                                        <span className="material-symbols-outlined">check</span>
+                                        Confirm
+                                    </button>
+                                </>
+                            ) : (
+                                <button className="group relative flex items-center justify-center gap-3 py-4 px-12 rounded-full bg-white dark:bg-surface-card-dark border border-slate-200 dark:border-slate-700 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all overflow-hidden w-full md:w-auto min-w-[280px]">
+                                    <div className="absolute inset-0 bg-primary/5 dark:bg-primary/10 scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500"></div>
+                                    <span className="material-symbols-outlined text-2xl text-primary group-hover:scale-110 group-hover:rotate-12 transition-transform duration-300">add_photo_alternate</span>
+                                    <div className="flex flex-col items-start">
+                                        <span className="text-text-main-light dark:text-text-main-dark font-bold text-base">Upload Image</span>
+                                        <span className="text-text-secondary-light dark:text-text-secondary-dark text-[10px] uppercase tracking-wider">From Gallery</span>
+                                    </div>
+                                </button>
+                            )}
                         </div>
                     </div>
 
@@ -235,6 +312,39 @@ const ScanProduct: React.FC = () => {
                     <p className="opacity-70 hover:opacity-100 transition-opacity">© 2025 ValidityVision Hackathon Project</p>
                 </footer>
             </div>
+
+            {/* Retake Confirmation Modal */}
+            {showRetakeModal && (
+                <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in">
+                    <div className="bg-white dark:bg-surface-card-dark rounded-2xl p-6 shadow-2xl max-w-sm w-full mx-4 border border-slate-200 dark:border-slate-700 scale-95 animate-scale-in">
+                        <div className="flex flex-col items-center text-center gap-4">
+                            <div className="p-3 bg-amber-100 dark:bg-amber-900/30 rounded-full text-amber-500">
+                                <span className="material-symbols-outlined text-3xl">warning</span>
+                            </div>
+                            <div>
+                                <h3 className="text-xl font-bold text-text-main-light dark:text-text-main-dark mb-2">Retake Photo?</h3>
+                                <p className="text-text-secondary-light dark:text-text-secondary-dark text-sm">
+                                    This will discard your current status. Are you sure you want to try again?
+                                </p>
+                            </div>
+                            <div className="grid grid-cols-2 gap-3 w-full mt-2">
+                                <button
+                                    onClick={cancelRetake}
+                                    className="py-3 px-4 rounded-xl border border-slate-200 dark:border-slate-700 font-bold text-text-secondary-light dark:text-text-secondary-dark hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={confirmRetake}
+                                    className="py-3 px-4 rounded-xl bg-primary text-white font-bold hover:bg-primary-dark transition-colors shadow-lg shadow-primary/20"
+                                >
+                                    Confirm
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
