@@ -1,15 +1,78 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const ScanProduct: React.FC = () => {
     const navigate = useNavigate();
+    const [isCameraActive, setIsCameraActive] = useState(false);
+    const [capturedImage, setCapturedImage] = useState<string | null>(null);
+    const [error, setError] = useState<string | null>(null);
+    const videoRef = useRef<HTMLVideoElement>(null);
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+
+    const startCamera = async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: 'environment' }
+            });
+            if (videoRef.current) {
+                videoRef.current.srcObject = stream;
+                setIsCameraActive(true);
+                setError(null);
+                setCapturedImage(null);
+            }
+        } catch (err) {
+            console.error("Error accessing camera:", err);
+            setError("Could not access camera. Please check permissions.");
+        }
+    };
+
+    const stopCamera = () => {
+        if (videoRef.current && videoRef.current.srcObject) {
+            const stream = videoRef.current.srcObject as MediaStream;
+            const tracks = stream.getTracks();
+            tracks.forEach(track => track.stop());
+            videoRef.current.srcObject = null;
+            setIsCameraActive(false);
+        }
+    };
 
     const handleScan = () => {
-        // Simulate scan processing
-        setTimeout(() => {
-            navigate('/scan-result');
-        }, 1500);
+        if (!isCameraActive && !capturedImage) {
+            startCamera();
+        } else if (isCameraActive) {
+            captureImage();
+        }
     };
+
+    const captureImage = () => {
+        if (videoRef.current && canvasRef.current) {
+            const video = videoRef.current;
+            const canvas = canvasRef.current;
+            const context = canvas.getContext('2d');
+
+            if (context) {
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                const imageDataUrl = canvas.toDataURL('image/png');
+                setCapturedImage(imageDataUrl);
+                stopCamera();
+
+                // Simulate processing delay then navigate
+                setTimeout(() => {
+                    navigate('/scan-result', { state: { image: imageDataUrl } });
+                }, 1500);
+            }
+        }
+    };
+
+    // Cleanup on unmount
+    useEffect(() => {
+        return () => {
+            stopCamera();
+        };
+    }, []);
 
     return (
         <div className="flex-1 flex flex-col h-full bg-background-light dark:bg-background-dark overflow-hidden relative">
@@ -22,13 +85,13 @@ const ScanProduct: React.FC = () => {
                         <h2 className="text-text-main-light dark:text-text-main-dark text-3xl font-black leading-tight tracking-[-0.03em]">Scan New Product</h2>
                     </div>
                     <p className="text-text-secondary-light dark:text-text-secondary-dark text-base font-normal">
-                        Point your camera at a barcode, ingredients list, or product label.
+                        Scan both sides of the product.
                     </p>
                 </div>
                 <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-surface-card-dark rounded-full border border-slate-200 dark:border-slate-700 shadow-sm">
-                        <span className="w-2 h-2 rounded-full bg-success shadow-[0_0_8px_rgba(16,185,129,0.6)] animate-pulse"></span>
-                        <span className="text-xs font-bold text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wider">System Ready</span>
+                        <span className={`w-2 h-2 rounded-full ${isCameraActive ? 'bg-red-500 animate-pulse' : 'bg-success'} shadow-[0_0_8px_rgba(16,185,129,0.6)]`}></span>
+                        <span className="text-xs font-bold text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wider">{isCameraActive ? 'Scanning...' : 'System Ready'}</span>
                     </div>
                 </div>
             </header>
@@ -37,56 +100,57 @@ const ScanProduct: React.FC = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 h-full max-h-[800px]">
                     <div className="lg:col-span-2 flex flex-col gap-6 animate-fade-in" style={{ animationDelay: '200ms' }}>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1">
+                        <div className="grid grid-cols-1 gap-4 flex-1">
                             {/* Front Picture Scanner */}
                             <div className="relative bg-slate-900 rounded-[32px] overflow-hidden shadow-2xl border border-slate-200 dark:border-slate-700 group cursor-pointer flex flex-col aspect-[4/5] md:aspect-auto" onClick={handleScan}>
-                                <div className="absolute inset-0 bg-cover bg-center opacity-40 group-hover:opacity-60 transition-opacity duration-700" style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuC1z3S20VnCZNSwqt57IEiCZu3bOtkrHSfL82zsE4w_26K5yQZF_ImoJsVSrJvdz2eStVpX45tLV4YoGAh71J6IXkQHWWseS1QUPuPrY5U02cKKjqCFYZLo1ZFdZceWiEqPKw2qAU4jRfhCvrOudjktNdzfGWa4FyEhnoVeCB3YetCcRKpZaoouQHxK3NvT7fxhY0EQy34Ft2DNc_zZns5u9dEeYaABF3-KRztZi9a7Yg4DvnJB8cSpERgMRQmgJejFUGYTx2fLqK4")', filter: 'blur(4px)', transform: 'scale(1.1)' }}></div>
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40"></div>
-                                <div className="absolute inset-8 scanner-overlay opacity-50 z-10 pointer-events-none transition-all duration-500 group-hover:opacity-80 group-hover:inset-6"></div>
-                                <div className="absolute left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent shadow-[0_0_20px_rgba(99,102,241,1)] z-20 animate-scan pointer-events-none"></div>
 
-                                <div className="absolute top-6 left-6 z-30">
+                                {!isCameraActive && !capturedImage && (
+                                    <>
+                                        <div className="absolute inset-0 bg-cover bg-center opacity-40 group-hover:opacity-60 transition-opacity duration-700" style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuC1z3S20VnCZNSwqt57IEiCZu3bOtkrHSfL82zsE4w_26K5yQZF_ImoJsVSrJvdz2eStVpX45tLV4YoGAh71J6IXkQHWWseS1QUPuPrY5U02cKKjqCFYZLo1ZFdZceWiEqPKw2qAU4jRfhCvrOudjktNdzfGWa4FyEhnoVeCB3YetCcRKpZaoouQHxK3NvT7fxhY0EQy34Ft2DNc_zZns5u9dEeYaABF3-KRztZi9a7Yg4DvnJB8cSpERgMRQmgJejFUGYTx2fLqK4")', filter: 'blur(4px)', transform: 'scale(1.1)' }}></div>
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40"></div>
+                                    </>
+                                )}
+
+                                <video
+                                    ref={videoRef}
+                                    autoPlay
+                                    playsInline
+                                    className={`absolute inset-0 w-full h-full object-cover ${isCameraActive ? 'opacity-100' : 'opacity-0'}`}
+                                />
+                                <canvas ref={canvasRef} className="hidden" />
+
+                                {capturedImage && (
+                                    <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${capturedImage})` }}></div>
+                                )}
+
+                                <div className="absolute inset-8 scanner-overlay opacity-50 z-10 pointer-events-none transition-all duration-500 group-hover:opacity-80 group-hover:inset-6"></div>
+                                {isCameraActive && <div className="absolute left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent shadow-[0_0_20px_rgba(99,102,241,1)] z-20 animate-scan pointer-events-none"></div>}
+
+                                {/* <div className="absolute top-6 left-6 z-30">
                                     <div className="flex items-center gap-2 bg-black/40 backdrop-blur-md px-4 py-2 rounded-full border border-white/10">
                                         <span className="material-symbols-outlined text-white text-sm">photo_camera_front</span>
                                         <span className="text-xs font-bold text-white uppercase tracking-wider">Front Picture</span>
                                     </div>
-                                </div>
+                                </div> */}
 
-                                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 border border-white/30 rounded-2xl flex items-center justify-center z-10">
+                                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 border border-white/30 rounded-2xl flex items-center justify-center z-10 pointer-events-none">
                                     <div className="w-full h-full relative">
                                         <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-primary"></div>
                                         <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-primary"></div>
                                         <div className="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-primary"></div>
                                         <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-primary"></div>
                                     </div>
-                                    <span className="absolute -bottom-6 text-white/70 text-[10px] font-medium tracking-wide whitespace-nowrap">Tap to Capture</span>
+                                    <span className="absolute -bottom-6 text-white/70 text-[10px] font-medium tracking-wide whitespace-nowrap">
+                                        {isCameraActive ? 'Tap to Capture' : capturedImage ? 'Processing...' : 'Tap to Capture'}
+                                    </span>
                                 </div>
+                                {error && (
+                                    <div className="absolute bottom-10 left-0 right-0 text-center text-red-500 bg-black/50 p-2">
+                                        {error}
+                                    </div>
+                                )}
                             </div>
 
-                            {/* Back Picture Scanner */}
-                            <div className="relative bg-slate-900 rounded-[32px] overflow-hidden shadow-2xl border border-slate-200 dark:border-slate-700 group cursor-pointer flex flex-col aspect-[4/5] md:aspect-auto" onClick={handleScan}>
-                                <div className="absolute inset-0 bg-cover bg-center opacity-40 group-hover:opacity-60 transition-opacity duration-700" style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuA_P1louIyjYkuCJSWSvtVEvGzgQfqGehYvbzmHKDQvq75RhP86YnQh8Bx6LilAMUkAohGCx8Eu7IvgQ3dyOhmVcOoiOxAijdcvUwPqVBQVI722ToIJBPSu-Jg_X0OeFYKwddkkdz2m1RWnVr486VWDCqRL7XokOSTv9h6Lwu1UN7u3FAhZjam0EwB1w2iysfaox2Z-bdEAgXfZbU6BobezhkvVWzV5HxoeKl-c4wqTrbxNCot40SGWZVtp51K-S6X3VWBesvvtJ_g")', filter: 'blur(4px)', transform: 'scale(1.1)' }}></div>
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40"></div>
-                                <div className="absolute inset-8 scanner-overlay opacity-50 z-10 pointer-events-none transition-all duration-500 group-hover:opacity-80 group-hover:inset-6"></div>
-                                <div className="absolute left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-400 to-transparent shadow-[0_0_20px_rgba(96,165,250,1)] z-20 animate-scan pointer-events-none"></div>
-
-                                <div className="absolute top-6 left-6 z-30">
-                                    <div className="flex items-center gap-2 bg-black/40 backdrop-blur-md px-4 py-2 rounded-full border border-white/10">
-                                        <span className="material-symbols-outlined text-white text-sm">photo_camera_back</span>
-                                        <span className="text-xs font-bold text-white uppercase tracking-wider">Back Picture</span>
-                                    </div>
-                                </div>
-
-                                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 border border-white/30 rounded-2xl flex items-center justify-center z-10">
-                                    <div className="w-full h-full relative">
-                                        <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-white"></div>
-                                        <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-white"></div>
-                                        <div className="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-white"></div>
-                                        <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-white"></div>
-                                    </div>
-                                    <span className="absolute -bottom-6 text-white/70 text-[10px] font-medium tracking-wide whitespace-nowrap">Tap to Capture</span>
-                                </div>
-                            </div>
                         </div>
 
                         <div className="flex justify-center mt-2">
