@@ -169,7 +169,7 @@ const ScanProduct: React.FC = () => {
                 accept="image/*"
                 onChange={handleFileChange}
             />
-            <header className="w-full px-10 py-8 flex justify-between items-end shrink-0 z-20 relative animate-fade-in">
+            <header className="w-full px-4 md:px-10 py-6 md:py-8 flex flex-col md:flex-row justify-between items-start md:items-end gap-4 md:gap-0 shrink-0 z-20 relative animate-fade-in">
                 <div className="flex flex-col gap-2">
                     <div className="flex items-center gap-3">
                         <div className="p-2 bg-primary/10 dark:bg-primary/20 rounded-xl text-primary relative">
@@ -189,7 +189,7 @@ const ScanProduct: React.FC = () => {
                 </div>
             </header>
 
-            <div className="flex-1 overflow-y-auto px-10 pb-10 custom-scrollbar z-10 relative">
+            <div className="flex-1 overflow-y-auto px-4 md:px-10 pb-10 custom-scrollbar z-10 relative">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 h-full max-h-[800px]">
                     <div className="lg:col-span-2 flex flex-col gap-6 animate-fade-in" style={{ animationDelay: '200ms' }}>
 
@@ -247,26 +247,26 @@ const ScanProduct: React.FC = () => {
                         </div>
 
                         {/* Controls / Actions */}
-                        <div className="flex justify-center mt-2 gap-4">
+                        <div className="flex flex-col sm:flex-row justify-center mt-2 gap-4 w-full">
                             {(scanStep === 'front-review' || scanStep === 'back-review') ? (
                                 <>
                                     <button
                                         onClick={handleRetakeRequest}
-                                        className="flex items-center justify-center gap-2 py-4 px-8 rounded-full bg-white dark:bg-surface-card-dark border border-slate-200 dark:border-slate-700 shadow-lg hover:shadow-xl hover:bg-slate-50 transition-all text-text-main-light dark:text-text-main-dark font-bold min-w-[150px]"
+                                        className="flex items-center justify-center gap-2 py-4 px-8 rounded-full bg-white dark:bg-surface-card-dark border border-slate-200 dark:border-slate-700 shadow-lg hover:shadow-xl hover:bg-slate-50 transition-all text-text-main-light dark:text-text-main-dark font-bold w-full sm:w-auto min-w-[150px]"
                                     >
                                         <span className="material-symbols-outlined">replay</span>
                                         Retake
                                     </button>
                                     <button
                                         onClick={handleConfirm}
-                                        className="flex items-center justify-center gap-2 py-4 px-8 rounded-full bg-primary text-white shadow-lg hover:shadow-xl hover:bg-primary-dark transition-all font-bold min-w-[150px]"
+                                        className="flex items-center justify-center gap-2 py-4 px-8 rounded-full bg-primary text-white shadow-lg hover:shadow-xl hover:bg-primary-dark transition-all font-bold w-full sm:w-auto min-w-[150px]"
                                     >
                                         <span className="material-symbols-outlined">check</span>
                                         Confirm
                                     </button>
                                 </>
                             ) : (
-                                <button onClick={handleUploadClick} className="group relative flex items-center justify-center gap-3 py-4 px-12 rounded-full bg-white dark:bg-surface-card-dark border border-slate-200 dark:border-slate-700 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all overflow-hidden w-full md:w-auto min-w-[280px]">
+                                <button onClick={handleUploadClick} className="group relative flex items-center justify-center gap-3 py-4 px-12 rounded-full bg-white dark:bg-surface-card-dark border border-slate-200 dark:border-slate-700 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all overflow-hidden w-full sm:w-auto min-w-[280px]">
                                     <div className="absolute inset-0 bg-primary/5 dark:bg-primary/10 scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500"></div>
                                     <span className="material-symbols-outlined text-2xl text-primary group-hover:scale-110 group-hover:rotate-12 transition-transform duration-300">add_photo_alternate</span>
                                     <div className="flex flex-col items-start">

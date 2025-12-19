@@ -1,0 +1,7 @@
+runtime: custom
+env: flex
+service: default
+
+# This configuration tells App Engine to use the Dockerfile to build the image.
+# Note: 'env: flex' is required for custom runtimes (Dockerfiles) on App Engine.
+# If you are deploying to Cloud Run, this file is generally ignored unless using specific buildpacks triggers.
