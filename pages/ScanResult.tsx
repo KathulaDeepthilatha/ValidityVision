@@ -8,7 +8,8 @@ interface ScanData {
     status: string;
     score: number;
     dates: {
-        expiry: string;
+        expiry?: string;
+        bestBefore?: string;
         manufactured: string;
         daysLeft: number;
     };
@@ -26,28 +27,140 @@ interface ScanData {
 const ScanResult: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { frontImage, backImage } = location.state || {};
+    const { frontImage, backImage, scanData: apiScanData } = location.state || {};
     const [activeView, setActiveView] = useState<'front' | 'back'>('front');
     const [scanData, setScanData] = useState<ScanData | null>(null);
     const [loading, setLoading] = useState(true);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editedData, setEditedData] = useState<ScanData | null>(null);
+    const [scanId, setScanId] = useState<number | null>(null);
+
+    const calculateExpiryDate = (manufacturedDate: string, bestBefore: string): string => {
+        try {
+            const mDate = new Date(manufacturedDate);
+            const match = bestBefore.match(/(\d+)\s+(year|month|day|week)s?/i);
+
+            if (match && !isNaN(mDate.getTime())) {
+                const amount = parseInt(match[1]);
+                const unit = match[2].toLowerCase();
+
+                const expDate = new Date(mDate);
+                if (unit === 'year') expDate.setFullYear(expDate.getFullYear() + amount);
+                else if (unit === 'month') expDate.setMonth(expDate.getMonth() + amount);
+                else if (unit === 'week') expDate.setDate(expDate.getDate() + (amount * 7));
+                else if (unit === 'day') expDate.setDate(expDate.getDate() + amount);
+
+                return expDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+            }
+        } catch (e) {
+            console.error("Date calculation error", e);
+        }
+        return "Unknown";
+    };
 
     useEffect(() => {
-        const fetchScanResult = async () => {
+        const processScanResult = () => {
             try {
-                // In a real app, you might send the images to an API here
-                // For now, we fetch the mock result
-                const response = await fetch('/mock-scan-result.json');
-                const data = await response.json();
+                if (!apiScanData) {
+                    console.error('No scan data received from API');
+                    setLoading(false);
+                    return;
+                }
+
+                // Use the API response data directly
+                const data = apiScanData;
+
+                // Logic to handle missing expiry date
+                if ((!data.dates.expiry || data.dates.expiry === "Unknown") && data.dates.manufactured && data.dates.bestBefore) {
+                    data.dates.expiry = calculateExpiryDate(data.dates.manufactured, data.dates.bestBefore);
+
+                    // Recalculate days left
+                    const expDate = new Date(data.dates.expiry);
+                    const today = new Date();
+                    const diffTime = expDate.getTime() - today.getTime();
+                    data.dates.daysLeft = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                }
+
                 setScanData(data);
+
+                // Store scan result in localStorage for inventory
+                const existingScans = JSON.parse(localStorage.getItem('scanHistory') || '[]');
+                const scanIdentifier = Date.now();
+                const newScan = {
+                    id: scanIdentifier,
+                    timestamp: new Date().toISOString(),
+                    frontImage,
+                    backImage,
+                    data
+                };
+                existingScans.unshift(newScan);
+                localStorage.setItem('scanHistory', JSON.stringify(existingScans));
+                setScanId(scanIdentifier);
+
             } catch (error) {
-                console.error('Error fetching scan result:', error);
+                console.error('Error processing scan result:', error);
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchScanResult();
-    }, []);
+        processScanResult();
+    }, [apiScanData, frontImage, backImage]);
+
+    const handleEditClick = () => {
+        setEditedData(JSON.parse(JSON.stringify(scanData))); // Deep copy
+        setIsEditing(true);
+    };
+
+    const handleCancelEdit = () => {
+        setEditedData(null);
+        setIsEditing(false);
+    };
+
+    const handleSaveEdit = () => {
+        if (!editedData) return;
+
+        // Update the current scan data
+        setScanData(editedData);
+
+        // Update in localStorage
+        const existingScans = JSON.parse(localStorage.getItem('scanHistory') || '[]');
+        const scanIndex = existingScans.findIndex((scan: any) => scan.id === scanId);
+
+        if (scanIndex !== -1) {
+            existingScans[scanIndex].data = editedData;
+            localStorage.setItem('scanHistory', JSON.stringify(existingScans));
+        }
+
+        setIsEditing(false);
+    };
+
+    const handleFieldChange = (field: string, value: any) => {
+        if (!editedData) return;
+
+        setEditedData(prev => {
+            if (!prev) return prev;
+
+            // Handle nested fields
+            if (field.includes('.')) {
+                const [parent, child] = field.split('.');
+                return {
+                    ...prev,
+                    [parent]: {
+                        ...(prev as any)[parent],
+                        [child]: value
+                    }
+                };
+            }
+
+            return {
+                ...prev,
+                [field]: value
+            };
+        });
+    };
+
+    const displayData = isEditing ? editedData : scanData;
 
     // Determine the image to show. Prioritize captured images, then API image.
     const displayImage = activeView === 'front'
@@ -99,12 +212,33 @@ const ScanResult: React.FC = () => {
                                         </button>
                                     </div>
                                     <div className="absolute bottom-0 left-0 p-6 w-full">
-                                        <p className="text-accent-purple text-xs font-bold uppercase tracking-wider mb-2 flex items-center gap-1">
-                                            <span className="size-1.5 bg-accent-purple rounded-full animate-pulse"></span>
-                                            {scanData?.category}
-                                        </p>
-                                        <h1 className="text-white text-3xl font-display font-bold leading-tight mb-1 drop-shadow-lg">{scanData?.name}</h1>
-                                        <p className="text-white/80 text-sm font-medium">Nature's Best</p>
+                                        {isEditing ? (
+                                            <>
+                                                <input
+                                                    type="text"
+                                                    value={editedData?.category || ''}
+                                                    onChange={(e) => handleFieldChange('category', e.target.value)}
+                                                    className="text-accent-purple text-xs font-bold uppercase tracking-wider mb-2 bg-black/30 backdrop-blur-md border border-white/20 rounded px-2 py-1 w-full text-white"
+                                                    placeholder="Category"
+                                                />
+                                                <input
+                                                    type="text"
+                                                    value={editedData?.name || ''}
+                                                    onChange={(e) => handleFieldChange('name', e.target.value)}
+                                                    className="text-white text-3xl font-display font-bold leading-tight mb-1 drop-shadow-lg bg-black/30 backdrop-blur-md border border-white/20 rounded px-3 py-2 w-full"
+                                                    placeholder="Product Name"
+                                                />
+                                            </>
+                                        ) : (
+                                            <>
+                                                <p className="text-accent-purple text-xs font-bold uppercase tracking-wider mb-2 flex items-center gap-1">
+                                                    <span className="size-1.5 bg-accent-purple rounded-full animate-pulse"></span>
+                                                    {displayData?.category}
+                                                </p>
+                                                <h1 className="text-white text-3xl font-display font-bold leading-tight mb-1 drop-shadow-lg">{displayData?.name}</h1>
+                                                <p className="text-white/80 text-sm font-medium">Nature's Best</p>
+                                            </>
+                                        )}
                                     </div>
                                 </div>
                             </div>

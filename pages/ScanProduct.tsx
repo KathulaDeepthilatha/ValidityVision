@@ -1,5 +1,30 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import imageCompression from 'browser-image-compression';
+
+// Helper: Convert Base64 to File
+const dataURLtoFile = (dataurl: string, filename: string): File => {
+    const arr = dataurl.split(',');
+    const match = arr[0].match(/:(.*?);/);
+    const mime = match ? match[1] : 'image/jpeg';
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) {
+        u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new File([u8arr], filename, { type: mime });
+};
+
+// Helper: Convert File to Base64
+const fileToDataURL = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = error => reject(error);
+    });
+};
 
 const ScanProduct: React.FC = () => {
     const navigate = useNavigate();
@@ -52,7 +77,7 @@ const ScanProduct: React.FC = () => {
         }
     };
 
-    const captureImage = () => { 
+    const captureImage = () => {
         if (videoRef.current && canvasRef.current) {
             const video = videoRef.current;
             const canvas = canvasRef.current;
@@ -79,50 +104,60 @@ const ScanProduct: React.FC = () => {
     const processImages = async (front: string, back: string) => {
         setIsProcessing(true);
         try {
-            // User provided API endpoint
-            const API_URL = `${import.meta.env.VITE_API_URL}/scan`;
-
-            const payload = {
-                imageOne: front,
-                imagetwo: back,
-                username: localStorage.getItem('username') || 'Nani'
+            // --- Image Compression Step ---
+            const options = {
+                maxSizeMB: 0.9, // Target under 1MB as requested
+                maxWidthOrHeight: 1920, // Good balance for OCR/AI
+                useWebWorker: true,
+                fileType: 'image/jpeg'
             };
 
-            console.log("Sending request to:", API_URL);
+            const frontFile = dataURLtoFile(front, 'front-scan.jpg');
+            const backFile = dataURLtoFile(back, 'back-scan.jpg');
 
-            // Artificial delay to simulate network request for demo purposes completely optional
-            // remove in production if not needed
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            console.log(`Original Sizes - Front: ${(frontFile.size / 1024 / 1024).toFixed(2)}MB, Back: ${(backFile.size / 1024 / 1024).toFixed(2)}MB`);
 
-            let data;
-            try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(payload)
-                });
+            const [compressedFrontFile, compressedBackFile] = await Promise.all([
+                imageCompression(frontFile, options),
+                imageCompression(backFile, options)
+            ]);
 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
+            console.log(`Compressed Sizes - Front: ${(compressedFrontFile.size / 1024 / 1024).toFixed(2)}MB, Back: ${(compressedBackFile.size / 1024 / 1024).toFixed(2)}MB`);
 
-                data = await response.json();
-            } catch (fetchError) {
-                console.warn("API request failed (expected if local server not running), using mock data:", fetchError);
-                // Fallback Mock Data for demonstration
-                data = {
-                    success: true,
-                    product: {
-                        name: "Mock Product",
-                        // Use the captured image as the product image
-                        image: front,
-                        category: "Snack",
-                        daysLeft: 7,
-                        status: "Safe"
-                    }
-                };
+            const compressedFrontBase64 = await fileToDataURL(compressedFrontFile);
+            const compressedBackBase64 = await fileToDataURL(compressedBackFile);
+            // -----------------------------
+
+            // Actual API endpoint
+            const API_URL = 'https://vision-1039670019942.asia-south1.run.app/api/scan';
+
+            // Get user email from localStorage (set during onboarding/registration)
+            const userEmail = localStorage.getItem('userEmail') || 'test@example.com';
+
+            const payload = {
+                email: userEmail,
+                frontImage: compressedFrontBase64,
+                backImage: compressedBackBase64
+            };
+
+            console.log("Sending scan request to:", API_URL);
+
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            if (!data.success) {
+                throw new Error('API returned unsuccessful response');
             }
 
             // Navigate to result page with the response data
@@ -130,7 +165,7 @@ const ScanProduct: React.FC = () => {
                 state: {
                     frontImage: front,
                     backImage: back,
-                    product: data.product,
+                    scanData: data.data,
                     apiResponse: data
                 }
             });

@@ -31,7 +31,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobileMenuOpen, setIsMobileMenuOpen
   const menuItems = [
     { path: '/home', icon: 'home', label: 'Home' },
     { path: '/scan', icon: 'barcode_scanner', label: 'Scan Product' },
-    { path: '/inventory', icon: 'inventory_2', label: 'Inventory' },
+    { path: '/inventory', icon: 'inventory_2', label: 'Pantry' },
     { path: '/settings', icon: 'settings', label: 'Settings' },
   ];
 

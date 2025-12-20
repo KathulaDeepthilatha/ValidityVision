@@ -44,7 +44,10 @@ const Onboarding: React.FC = () => {
       console.warn("Error details:", e);
     }
 
+    // Save user credentials for API requests
     localStorage.setItem('username', formData.username);
+    localStorage.setItem('userEmail', formData.email);
+
     setIsLoading(false);
     setShowModal(false);
     navigate('/home');

@@ -10,167 +10,6 @@ interface InventoryItem {
   status: 'fresh' | 'expiring' | 'expired' | 'consumed';
 }
 
-const initialItems: InventoryItem[] = [
-  {
-    id: '1',
-    name: 'Fresh Spinach',
-    category: 'Vegetables',
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAqVtsOUP9y7cuNVE6WT8eT6-Isy1Dc14mG6eKXf7188ZtZBs0v-luCFBYnuUDtblQn1WxngbGwdcyhpPew_2AzFjnuo26fUXM3q2gVpnwAy-9nW_k7jAr-XZERArHz93FMAYTTmPvIqRdH7h43md-LYv1rVeQBVnuBngIfyT8qVSQdj-CcJa_sc3pDUezkBL0pKuOPRs-bhFcIot5Y9L_Ag0MVgyq3yYlgZO2_QtFeqDwUSagByEjcjCG5gZHLXdQjnuT0T_7F83w',
-    daysLeft: 1,
-    status: 'expiring'
-  },
-  {
-    id: '2',
-    name: 'Organic Milk',
-    category: 'Dairy',
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuA_P1louIyjYkuCJSWSvtVEvGzgQfqGehYvbzmHKDQvq75RhP86YnQh8Bx6LilAMUkAohGCx8Eu7IvgQ3dyOhmVcOoiOxAijdcvUwPqVBQVI722ToIJBPSu-Jg_X0OeFYKwddkkdz2m1RWnVr486VWDCqRL7XokOSTv9h6Lwu1UN7u3FAhZjam0EwB1w2iysfaox2Z-bdEAgXfZbU6BobezhkvVWzV5HxoeKl-c4wqTrbxNCot40SGWZVtp51K-S6X3VWBesvvtJ_g',
-    daysLeft: 2,
-    status: 'expiring'
-  },
-  {
-    id: '3',
-    name: 'Greek Yogurt',
-    category: 'Dairy',
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDtUGd_KdY_7bpP9Cmz8Q8n16PXuLNeabjqYkuBYrDjfhyT5u8T0D4XvqweU2TVCpum0ukJRVbvYuYZZwlP270LnmlceABE5igrS2AsHUBbDCCMPCwCJu3OdNtnPTZB-Ck5NFSoB-KiQ_ULlw_jjX1w8aEyOhDud63g0VcHztqF6kYNf9ZvmJ4jtMR_D26fGapYdIxBMnUK8BBN1isdttB8B8jbLofemm0uNXN0qpEH_7QdtZRqJSXMOUBCLj2wiYFb5H4M9sVb1sA',
-    status: 'expired'
-  },
-  {
-    id: '4',
-    name: 'Avocados (3)',
-    category: 'Produce',
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuC1z3S20VnCZNSwqt57IEiCZu3bOtkrHSfL82zsE4w_26K5yQZF_ImoJsVSrJvdz2eStVpX45tLV4YoGAh71J6IXkQHWWseS1QUPuPrY5U02cKKjqCFYZLo1ZFdZceWiEqPKw2qAU4jRfhCvrOudjktNdzfGWa4FyEhnoVeCB3YetCcRKpZaoouQHxK3NvT7fxhY0EQy34Ft2DNc_zZns5u9dEeYaABF3-KRztZi9a7Yg4DvnJB8cSpERgMRQmgJejFUGYTx2fLqK4',
-    daysLeft: 3,
-    status: 'expiring'
-  },
-  {
-    id: '5',
-    name: 'Cheddar Cheese',
-    category: 'Dairy',
-    image: 'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?q=80&w=2070&auto=format&fit=crop',
-    status: 'expired'
-  },
-  {
-    id: '6',
-    name: 'Bread',
-    category: 'Bakery',
-    image: 'https://images.unsplash.com/photo-1598373182133-52452f7691ef?q=80&w=2070&auto=format&fit=crop',
-    status: 'expired'
-  },
-  {
-    id: '7',
-    name: 'Apple Juice',
-    category: 'Beverages',
-    image: 'https://images.unsplash.com/photo-1621506289937-a8e4df240d0b?q=80&w=1974&auto=format&fit=crop',
-    status: 'consumed'
-  },
-  {
-    id: '8',
-    name: 'Bananas',
-    category: 'Produce',
-    image: 'https://images.unsplash.com/photo-1603833665858-e61d17a86271?q=80&w=1974&auto=format&fit=crop',
-    status: 'consumed'
-  },
-  {
-    id: '9',
-    name: 'Chicken Breast',
-    category: 'Meat',
-    image: 'https://images.unsplash.com/photo-1604503468506-a8da13d82791?q=80&w=1889&auto=format&fit=crop',
-    status: 'consumed'
-  },
-  // New Expiring Items to trigger pagination (>8 items)
-  {
-    id: '10',
-    name: 'Tomatoes',
-    category: 'Produce',
-    image: 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?q=80&w=1740&auto=format&fit=crop',
-    daysLeft: 2,
-    status: 'expiring'
-  },
-  {
-    id: '11',
-    name: 'Strawberries',
-    category: 'Produce',
-    image: 'https://images.unsplash.com/photo-1464965911861-746a04b4bca6?q=80&w=1740&auto=format&fit=crop',
-    daysLeft: 1,
-    status: 'expiring'
-  },
-  {
-    id: '12',
-    name: 'Salmon Fillet',
-    category: 'Meat',
-    image: 'https://images.unsplash.com/photo-1599084993091-1cb5c0721cc6?q=80&w=1740&auto=format&fit=crop',
-    daysLeft: 1,
-    status: 'expiring'
-  },
-  {
-    id: '13',
-    name: 'Heavy Cream',
-    category: 'Dairy',
-    image: 'https://images.unsplash.com/photo-1628088062854-d1870b4553da?q=80&w=1740&auto=format&fit=crop',
-    daysLeft: 3,
-    status: 'expiring'
-  },
-  {
-    id: '14',
-    name: 'Bagels',
-    category: 'Bakery',
-    image: 'https://images.unsplash.com/photo-1585476644321-b97621cba577?q=80&w=1740&auto=format&fit=crop',
-    daysLeft: 2,
-    status: 'expiring'
-  },
-  {
-    id: '15',
-    name: 'Cilantro',
-    category: 'Produce',
-    image: 'https://images.unsplash.com/photo-1620574387735-3624d75b2dbc?q=80&w=1740&auto=format&fit=crop',
-    daysLeft: 1,
-    status: 'expiring'
-  },
-  // New Consumed Items to trigger pagination (>8 items)
-  {
-    id: '16',
-    name: 'Pasta Sauce',
-    category: 'Pantry',
-    image: 'https://images.unsplash.com/photo-1572449043416-55f4685c9bb7?q=80&w=1780&auto=format&fit=crop',
-    status: 'consumed'
-  },
-  {
-    id: '17',
-    name: 'Rice',
-    category: 'Pantry',
-    image: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?q=80&w=1740&auto=format&fit=crop',
-    status: 'consumed'
-  },
-  {
-    id: '18',
-    name: 'Black Beans',
-    category: 'Pantry',
-    image: 'https://images.unsplash.com/photo-1563636619-e9143da7973b?q=80&w=1740&auto=format&fit=crop',
-    status: 'consumed'
-  },
-  {
-    id: '19',
-    name: 'Tortillas',
-    category: 'Bakery',
-    image: 'https://images.unsplash.com/photo-1565557623262-b51c2513a641?q=80&w=1971&auto=format&fit=crop',
-    status: 'consumed'
-  },
-  {
-    id: '20',
-    name: 'Orange Juice',
-    category: 'Beverages',
-    image: 'https://images.unsplash.com/photo-1613478223719-2ab802602423?q=80&w=1889&auto=format&fit=crop',
-    status: 'consumed'
-  },
-  {
-    id: '21',
-    name: 'Butter',
-    category: 'Dairy',
-    image: 'https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?q=80&w=1740&auto=format&fit=crop',
-    status: 'consumed'
-  }
-];
-
 import { SidebarContext } from '../App';
 
 const Inventory: React.FC = () => {
@@ -179,7 +18,51 @@ const Inventory: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'all' | 'expiring' | 'expired' | 'consumed'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
   const itemsPerPage = 8;
+
+  // Load scan history from localStorage
+  useEffect(() => {
+    const loadInventory = () => {
+      try {
+        const scanHistory = JSON.parse(localStorage.getItem('scanHistory') || '[]');
+
+        const items: InventoryItem[] = scanHistory.map((scan: any, index: number) => {
+          const scanData = scan.data;
+
+          // Determine status based on days left
+          let status: 'fresh' | 'expiring' | 'expired' | 'consumed' = 'fresh';
+          const daysLeft = scanData?.dates?.daysLeft;
+
+          if (daysLeft !== undefined && daysLeft !== null) {
+            if (daysLeft < 0) {
+              status = 'expired';
+            } else if (daysLeft <= 3) {
+              status = 'expiring';
+            } else {
+              status = 'fresh';
+            }
+          }
+
+          return {
+            id: scan.id?.toString() || `scan-${index}`,
+            name: scanData?.name || 'Unknown Product',
+            category: scanData?.category || 'Uncategorized',
+            image: scanData?.image || scan.frontImage || 'https://via.placeholder.com/400',
+            daysLeft: daysLeft,
+            status: status
+          };
+        });
+
+        setInventoryItems(items);
+      } catch (error) {
+        console.error('Error loading inventory:', error);
+        setInventoryItems([]);
+      }
+    };
+
+    loadInventory();
+  }, []);
 
   // Reset to first page when tab or search changes
   useEffect(() => {
@@ -187,7 +70,7 @@ const Inventory: React.FC = () => {
   }, [activeTab, searchQuery]);
 
   // Pagination Logic
-  const filteredItems = initialItems.filter(item => {
+  const filteredItems = inventoryItems.filter(item => {
     const matchesTab = activeTab === 'all' || item.status === activeTab;
     const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.category.toLowerCase().includes(searchQuery.toLowerCase());
@@ -200,6 +83,13 @@ const Inventory: React.FC = () => {
   const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
+  // Calculate statistics from actual data
+  const totalItems = inventoryItems.length;
+  const expiringItems = inventoryItems.filter(item => item.status === 'expiring').length;
+  const safetyScore = inventoryItems.length > 0
+    ? Math.round((inventoryItems.filter(item => item.status === 'fresh' || item.status === 'expiring').length / inventoryItems.length) * 100)
+    : 100;
 
   return (
     <div className="flex-1 flex flex-col h-full bg-background-light dark:bg-background-dark overflow-hidden relative">
@@ -234,9 +124,9 @@ const Inventory: React.FC = () => {
       <div className="flex-1 overflow-y-auto px-4 md:px-8 pb-8 custom-scrollbar z-10 relative">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
           {[
-            { label: 'Total Items', value: '42', icon: 'inventory_2', color: 'text-accent-orange', bg: 'bg-orange-50 dark:bg-orange-900/20', sub: '+4 added today', ring: 'ring-accent-orange/10' },
-            { label: 'Expiring Soon', value: '3', icon: 'warning', color: 'text-accent-yellow', bg: 'bg-amber-50 dark:bg-amber-900/20', sub: 'Action Needed', ring: 'ring-accent-yellow/10', isAlert: true },
-            { label: 'Safety Score', value: '94%', icon: 'verified_user', color: 'text-primary', bg: 'bg-purple-50 dark:bg-purple-900/20', sub: 'Pantry is healthy', ring: 'ring-primary/10', isProgress: true }
+            { label: 'Total Items', value: totalItems.toString(), icon: 'inventory_2', color: 'text-accent-orange', bg: 'bg-orange-50 dark:bg-orange-900/20', sub: `${inventoryItems.filter((_, i) => i < 3).length} recent scans`, ring: 'ring-accent-orange/10' },
+            { label: 'Expiring Soon', value: expiringItems.toString(), icon: 'warning', color: 'text-accent-yellow', bg: 'bg-amber-50 dark:bg-amber-900/20', sub: expiringItems > 0 ? 'Action Needed' : 'All Good', ring: 'ring-accent-yellow/10', isAlert: expiringItems > 0 },
+            { label: 'Safety Score', value: `${safetyScore}%`, icon: 'verified_user', color: 'text-primary', bg: 'bg-purple-50 dark:bg-purple-900/20', sub: safetyScore >= 80 ? 'Pantry is healthy' : 'Needs attention', ring: 'ring-primary/10', isProgress: true, progressWidth: safetyScore }
           ].map((stat, i) => (
             <div key={i} className="flex flex-col gap-2 rounded-2xl p-6 bg-surface-card-light dark:bg-surface-card-dark border border-slate-100 dark:border-slate-800 shadow-card dark:shadow-none relative overflow-hidden group hover:shadow-hover hover:-translate-y-1 transition-all duration-300">
               <div className="absolute right-0 top-0 p-4 opacity-[0.03] dark:opacity-[0.05] group-hover:scale-110 transition-transform duration-500 rotate-12">
@@ -253,7 +143,7 @@ const Inventory: React.FC = () => {
                 {stat.isAlert && <span className="text-amber-700 dark:text-amber-400 text-[10px] uppercase font-bold bg-amber-100 dark:bg-amber-900/40 px-2 py-1 rounded-full border border-amber-200 dark:border-amber-800/50">{stat.sub}</span>}
                 {stat.isProgress && (
                   <div className="flex-1 h-2 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
-                    <div className="h-full bg-gradient-to-r from-primary to-primary-dark w-[94%] shadow-[0_0_15px_rgba(139,92,246,0.5)]"></div>
+                    <div className="h-full bg-gradient-to-r from-primary to-primary-dark shadow-[0_0_15px_rgba(139,92,246,0.5)]" style={{ width: `${stat.progressWidth}%` }}></div>
                   </div>
                 )}
               </div>
@@ -269,7 +159,7 @@ const Inventory: React.FC = () => {
               )}
               {stat.isAlert && (
                 <div className="mt-auto pt-2">
-                  <p className="text-xs text-slate-400 dark:text-slate-500 font-medium">Review to reduce waste</p>
+                  <p className="text-xs text-slate-400 dark:text-slate-500 font-medium">{expiringItems > 0 ? 'Review to reduce waste' : 'Keep up the good work'}</p>
                 </div>
               )}
             </div>
@@ -306,92 +196,114 @@ const Inventory: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8">
-          {currentItems.map(item => (
-            <div key={item.id} className={`group relative flex flex-col rounded-2xl bg-surface-card-light dark:bg-surface-card-dark border shadow-card hover:shadow-hover hover:-translate-y-1 transition-all duration-300 overflow-hidden ${item.status === 'expired'
-              ? 'border-red-100 dark:border-red-900/50 hover:shadow-red-100/50 dark:hover:shadow-none grayscale hover:grayscale-0'
-              : 'border-slate-200 dark:border-slate-800'
-              }`}
-              onClick={() => navigate('/scan-result', { state: { product: item } })}
-            >
-              <div className="w-full aspect-[4/3] bg-cover bg-center relative" style={{ backgroundImage: `url("${item.image}")` }}>
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-70"></div>
-                <div className={`absolute top-3 right-3 backdrop-blur-md px-2.5 py-1 rounded-lg flex items-center gap-1.5 shadow-sm border border-white/10 ${item.status === 'expired' ? 'bg-black/40' : 'bg-black/40'
-                  }`}>
-                  {item.status === 'expiring' && (
-                    <>
-                      <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.8)]"></span>
-                      <span className="text-white text-xs font-bold uppercase tracking-wider">Safe</span>
-                    </>
-                  )}
-                  {item.status === 'expired' && (
-                    <>
-                      <span className="w-2 h-2 rounded-full bg-danger shadow-[0_0_8px_rgba(239,68,68,0.8)]"></span>
-                      <span className="text-white text-xs font-bold uppercase tracking-wider">Unsafe</span>
-                    </>
-                  )}
-                  {item.status === 'consumed' && (
-                    <>
-                      <span className="w-2 h-2 rounded-full bg-primary shadow-[0_0_8px_rgba(139,92,246,0.8)]"></span>
-                      <span className="text-white text-xs font-bold uppercase tracking-wider">Consumed</span>
-                    </>
-                  )}
+          {currentItems.map(item => {
+            // Find the original scan data for this item
+            const scanHistory = JSON.parse(localStorage.getItem('scanHistory') || '[]');
+            const originalScan = scanHistory.find((scan: any) => scan.id?.toString() === item.id);
+
+            return (
+              <div key={item.id} className={`group relative flex flex-col rounded-2xl bg-surface-card-light dark:bg-surface-card-dark border shadow-card hover:shadow-hover hover:-translate-y-1 transition-all duration-300 overflow-hidden ${item.status === 'expired'
+                ? 'border-red-100 dark:border-red-900/50 hover:shadow-red-100/50 dark:hover:shadow-none grayscale hover:grayscale-0'
+                : 'border-slate-200 dark:border-slate-800'
+                }`}
+                onClick={() => {
+                  if (originalScan) {
+                    navigate('/scan-result', {
+                      state: {
+                        frontImage: originalScan.frontImage,
+                        backImage: originalScan.backImage,
+                        scanData: originalScan.data
+                      }
+                    });
+                  }
+                }}
+              >
+                <div className="w-full aspect-[4/3] bg-cover bg-center relative" style={{ backgroundImage: `url("${item.image}")` }}>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-70"></div>
+                  <div className={`absolute top-3 right-3 backdrop-blur-md px-2.5 py-1 rounded-lg flex items-center gap-1.5 shadow-sm border border-white/10 ${item.status === 'expired' ? 'bg-black/40' : 'bg-black/40'
+                    }`}>
+                    {item.status === 'expiring' && (
+                      <>
+                        <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.8)]"></span>
+                        <span className="text-white text-xs font-bold uppercase tracking-wider">Safe</span>
+                      </>
+                    )}
+                    {item.status === 'fresh' && (
+                      <>
+                        <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.8)]"></span>
+                        <span className="text-white text-xs font-bold uppercase tracking-wider">Safe</span>
+                      </>
+                    )}
+                    {item.status === 'expired' && (
+                      <>
+                        <span className="w-2 h-2 rounded-full bg-danger shadow-[0_0_8px_rgba(239,68,68,0.8)]"></span>
+                        <span className="text-white text-xs font-bold uppercase tracking-wider">Unsafe</span>
+                      </>
+                    )}
+                    {item.status === 'consumed' && (
+                      <>
+                        <span className="w-2 h-2 rounded-full bg-primary shadow-[0_0_8px_rgba(139,92,246,0.8)]"></span>
+                        <span className="text-white text-xs font-bold uppercase tracking-wider">Consumed</span>
+                      </>
+                    )}
+                  </div>
+                </div>
+                <div className="p-5 flex flex-col flex-1 gap-4">
+                  <div>
+                    <h3 className={`text-text-main-light dark:text-text-main-dark text-lg font-bold leading-tight ${item.status === 'expired' ? 'decoration-red-300 line-through decoration-2 text-text-main-light/80 dark:text-text-main-dark/80' : ''}`}>
+                      {item.name}
+                    </h3>
+                    <p className="text-text-secondary-light dark:text-text-secondary-dark text-sm font-medium">{item.category}</p>
+                  </div>
+                  <div className="mt-auto">
+                    {/* Render different footer content based on status */}
+                    {item.status === 'expiring' && (
+                      <>
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-text-secondary-light dark:text-text-secondary-dark text-xs font-medium">Expires in</span>
+                          <span className="text-accent-yellow text-sm font-bold bg-amber-50 dark:bg-amber-900/30 px-2 py-0.5 rounded">{item.daysLeft} {item.daysLeft === 1 ? 'day' : 'days'}</span>
+                        </div>
+                        <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden mb-5">
+                          <div className="h-full bg-accent-yellow rounded-full" style={{ width: `${(item.daysLeft || 0) * 15}%` }}></div>
+                        </div>
+                        <button className="flex-1 w-full py-2.5 rounded-xl bg-primary dark:bg-primary-dark text-white text-sm font-bold hover:bg-primary-dark dark:hover:bg-primary shadow-lg shadow-primary/20 transition-all">
+                          Consume
+                        </button>
+                      </>
+                    )}
+
+                    {item.status === 'expired' && (
+                      <>
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-text-secondary-light dark:text-text-secondary-dark text-xs font-medium">Status</span>
+                          <span className="text-danger text-sm font-bold bg-red-50 dark:bg-red-900/30 px-2 py-0.5 rounded">Expired</span>
+                        </div>
+                        <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden mb-5">
+                          <div className="h-full bg-danger w-full rounded-full"></div>
+                        </div>
+                        <button className="w-full py-2.5 rounded-xl bg-white dark:bg-surface-card-dark border border-red-200 dark:border-red-900/50 hover:bg-red-50 dark:hover:bg-red-900/20 text-danger text-sm font-medium transition-colors flex items-center justify-center gap-2">
+                          <span className="material-symbols-outlined text-base">delete</span>
+                          Discard
+                        </button>
+                      </>
+                    )}
+
+                    {item.status === 'consumed' && (
+                      <>
+                        <div className="flex justify-between items-center mb-5">
+                          <span className="text-text-secondary-light dark:text-text-secondary-dark text-xs font-medium">Status</span>
+                          <span className="text-primary-dark dark:text-primary-soft text-sm font-bold bg-purple-50 dark:bg-purple-900/30 px-2 py-0.5 rounded">All Gone</span>
+                        </div>
+                        <button className="w-full py-2.5 rounded-xl bg-slate-50 dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 text-text-main-light dark:text-white text-sm font-semibold transition-colors border border-slate-200 dark:border-slate-600 hover:border-slate-300 dark:hover:border-slate-500">
+                          Consumed
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
-              <div className="p-5 flex flex-col flex-1 gap-4">
-                <div>
-                  <h3 className={`text-text-main-light dark:text-text-main-dark text-lg font-bold leading-tight ${item.status === 'expired' ? 'decoration-red-300 line-through decoration-2 text-text-main-light/80 dark:text-text-main-dark/80' : ''}`}>
-                    {item.name}
-                  </h3>
-                  <p className="text-text-secondary-light dark:text-text-secondary-dark text-sm font-medium">{item.category}</p>
-                </div>
-                <div className="mt-auto">
-                  {/* Render different footer content based on status */}
-                  {item.status === 'expiring' && (
-                    <>
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="text-text-secondary-light dark:text-text-secondary-dark text-xs font-medium">Expires in</span>
-                        <span className="text-accent-yellow text-sm font-bold bg-amber-50 dark:bg-amber-900/30 px-2 py-0.5 rounded">{item.daysLeft} {item.daysLeft === 1 ? 'day' : 'days'}</span>
-                      </div>
-                      <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden mb-5">
-                        <div className="h-full bg-accent-yellow rounded-full" style={{ width: `${(item.daysLeft || 0) * 15}%` }}></div>
-                      </div>
-                      <button className="flex-1 w-full py-2.5 rounded-xl bg-primary dark:bg-primary-dark text-white text-sm font-bold hover:bg-primary-dark dark:hover:bg-primary shadow-lg shadow-primary/20 transition-all">
-                        Consume
-                      </button>
-                    </>
-                  )}
-
-                  {item.status === 'expired' && (
-                    <>
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="text-text-secondary-light dark:text-text-secondary-dark text-xs font-medium">Status</span>
-                        <span className="text-danger text-sm font-bold bg-red-50 dark:bg-red-900/30 px-2 py-0.5 rounded">Expired</span>
-                      </div>
-                      <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden mb-5">
-                        <div className="h-full bg-danger w-full rounded-full"></div>
-                      </div>
-                      <button className="w-full py-2.5 rounded-xl bg-white dark:bg-surface-card-dark border border-red-200 dark:border-red-900/50 hover:bg-red-50 dark:hover:bg-red-900/20 text-danger text-sm font-medium transition-colors flex items-center justify-center gap-2">
-                        <span className="material-symbols-outlined text-base">delete</span>
-                        Discard
-                      </button>
-                    </>
-                  )}
-
-                  {item.status === 'consumed' && (
-                    <>
-                      <div className="flex justify-between items-center mb-5">
-                        <span className="text-text-secondary-light dark:text-text-secondary-dark text-xs font-medium">Status</span>
-                        <span className="text-primary-dark dark:text-primary-soft text-sm font-bold bg-purple-50 dark:bg-purple-900/30 px-2 py-0.5 rounded">All Gone</span>
-                      </div>
-                      <button className="w-full py-2.5 rounded-xl bg-slate-50 dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 text-text-main-light dark:text-white text-sm font-semibold transition-colors border border-slate-200 dark:border-slate-600 hover:border-slate-300 dark:hover:border-slate-500">
-                        Consumed
-                      </button>
-                    </>
-                  )}
-                </div>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Pagination Controls */}
