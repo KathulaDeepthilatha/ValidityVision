@@ -4,13 +4,13 @@ import { useNavigate, useLocation } from 'react-router-dom';
 const ScanResult: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { frontImage, backImage } = location.state || {}; // Retrieve images from state
+    const { frontImage, backImage, product } = location.state || {}; // Retrieve images or product from state
     const [activeView, setActiveView] = useState<'front' | 'back'>('front');
 
-    // Determine the image to show. Default to dynamic frontImage, fallback to static if missing.
+    // Determine the image to show. Default to dynamic frontImage, fallback to product image, then static if missing.
     const displayImage = activeView === 'front'
-        ? (frontImage || "https://lh3.googleusercontent.com/aida-public/AB6AXuBNFXHO5f6c8EtrXHfQPE0BQszR5UlL0HQEcqQdZtxAs-bW6Ikwr2DIR9uynLlpznJ0TKjOPF8XEroQK0GBEyZmCSOFZGZvzAjZSZ6WaRdXYZYgBjCbcPqb7Q5ub_8SvU2ovEL4jz_MqZWz8S1RjYI8eplc8eWTtRXd5Chf89cBYLyeoOWJLi3r18T-swZLAkLaUdsMxVXq_eAa6MJl8_kvqVPFzB_3P0hgRHRUGxWZyPvKtH0TMdzH2KGVSbNKWIEHZ8dI3T_sh3s")
-        : (backImage || frontImage || "https://lh3.googleusercontent.com/aida-public/AB6AXuBNFXHO5f6c8EtrXHfQPE0BQszR5UlL0HQEcqQdZtxAs-bW6Ikwr2DIR9uynLlpznJ0TKjOPF8XEroQK0GBEyZmCSOFZGZvzAjZSZ6WaRdXYZYgBjCbcPqb7Q5ub_8SvU2ovEL4jz_MqZWz8S1RjYI8eplc8eWTtRXd5Chf89cBYLyeoOWJLi3r18T-swZLAkLaUdsMxVXq_eAa6MJl8_kvqVPFzB_3P0hgRHRUGxWZyPvKtH0TMdzH2KGVSbNKWIEHZ8dI3T_sh3s");
+        ? (frontImage || product?.image || "https://lh3.googleusercontent.com/aida-public/AB6AXuBNFXHO5f6c8EtrXHfQPE0BQszR5UlL0HQEcqQdZtxAs-bW6Ikwr2DIR9uynLlpznJ0TKjOPF8XEroQK0GBEyZmCSOFZGZvzAjZSZ6WaRdXYZYgBjCbcPqb7Q5ub_8SvU2ovEL4jz_MqZWz8S1RjYI8eplc8eWTtRXd5Chf89cBYLyeoOWJLi3r18T-swZLAkLaUdsMxVXq_eAa6MJl8_kvqVPFzB_3P0hgRHRUGxWZyPvKtH0TMdzH2KGVSbNKWIEHZ8dI3T_sh3s")
+        : (backImage || frontImage || product?.image || "https://lh3.googleusercontent.com/aida-public/AB6AXuBNFXHO5f6c8EtrXHfQPE0BQszR5UlL0HQEcqQdZtxAs-bW6Ikwr2DIR9uynLlpznJ0TKjOPF8XEroQK0GBEyZmCSOFZGZvzAjZSZ6WaRdXYZYgBjCbcPqb7Q5ub_8SvU2ovEL4jz_MqZWz8S1RjYI8eplc8eWTtRXd5Chf89cBYLyeoOWJLi3r18T-swZLAkLaUdsMxVXq_eAa6MJl8_kvqVPFzB_3P0hgRHRUGxWZyPvKtH0TMdzH2KGVSbNKWIEHZ8dI3T_sh3s");
 
     return (
         <div className="flex-1 flex flex-col h-full bg-background-light dark:bg-background-light relative overflow-y-auto">
@@ -48,9 +48,9 @@ const ScanResult: React.FC = () => {
                                     <div className="absolute bottom-0 left-0 p-6 w-full">
                                         <p className="text-accent-purple text-xs font-bold uppercase tracking-wider mb-2 flex items-center gap-1">
                                             <span className="size-1.5 bg-accent-purple rounded-full animate-pulse"></span>
-                                            Dairy Alternatives
+                                            {product?.category || "Dairy Alternatives"}
                                         </p>
-                                        <h1 className="text-white text-3xl font-display font-bold leading-tight mb-1 drop-shadow-lg">Organic Almond Milk</h1>
+                                        <h1 className="text-white text-3xl font-display font-bold leading-tight mb-1 drop-shadow-lg">{product?.name || "Organic Almond Milk"}</h1>
                                         <p className="text-white/80 text-sm font-medium">Nature's Best</p>
                                     </div>
                                 </div>
@@ -68,7 +68,13 @@ const ScanResult: React.FC = () => {
                                             <span className="text-text-main-light font-mono font-medium text-xl tracking-tight">Oct 24, 2024</span>
                                         </div>
                                         <div className="text-right">
-                                            <span className="inline-block text-accent-purple text-xs font-bold bg-purple-100/50 border border-purple-200 px-3 py-1.5 rounded-full shadow-[0_0_10px_rgba(168,85,247,0.1)]">14 Days Left</span>
+                                            {product?.daysLeft !== undefined ? (
+                                                <span className={`inline-block text-xs font-bold px-3 py-1.5 rounded-full border shadow-[0_0_10px_rgba(0,0,0,0.1)] ${product.daysLeft <= 2 ? "text-red-600 bg-red-100 border-red-200" : "text-accent-purple bg-purple-100/50 border-purple-200"}`}>
+                                                    {product.daysLeft} Days Left
+                                                </span>
+                                            ) : (
+                                                <span className="inline-block text-accent-purple text-xs font-bold bg-purple-100/50 border border-purple-200 px-3 py-1.5 rounded-full shadow-[0_0_10px_rgba(168,85,247,0.1)]">14 Days Left</span>
+                                            )}
                                         </div>
                                     </div>
                                     <div className="flex justify-between items-center px-1">
@@ -108,7 +114,7 @@ const ScanResult: React.FC = () => {
                                         </div>
                                         <h2 className="text-4xl md:text-5xl font-display font-bold text-text-main-light tracking-tight drop-shadow-sm">Safe to Consume</h2>
                                         <p className="text-text-secondary-light text-base leading-relaxed max-w-lg">
-                                            No harmful ingredients or allergens detected based on your profile settings. This product is a <span className="text-text-main-light font-semibold">perfect match</span> for your diet.
+                                            No harmful ingredients or allergens detected based on your profile settings. This {product ? product.name.toLowerCase() : 'product'} is a <span className="text-text-main-light font-semibold">perfect match</span> for your diet.
                                         </p>
                                     </div>
                                     <div className="flex items-center gap-6">

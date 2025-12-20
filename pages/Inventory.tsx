@@ -280,8 +280,8 @@ const Inventory: React.FC = () => {
           <div className="flex gap-2 p-1.5 bg-white dark:bg-surface-card-dark rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-x-auto max-w-full">
             {[
               { id: 'all', label: 'All', icon: null, color: null },
-              { id: 'expiring', label: 'Expiring Soon', color: 'bg-accent-yellow' },
-              { id: 'expired', label: 'Expired', color: 'bg-danger' },
+              { id: 'expiring', label: 'Safe', color: 'bg-green-500' },
+              { id: 'expired', label: 'Unsafe', color: 'bg-danger' },
               { id: 'consumed', label: 'Consumed', color: 'bg-primary-dark' }
             ].map(tab => (
               <button
@@ -310,15 +310,17 @@ const Inventory: React.FC = () => {
             <div key={item.id} className={`group relative flex flex-col rounded-2xl bg-surface-card-light dark:bg-surface-card-dark border shadow-card hover:shadow-hover hover:-translate-y-1 transition-all duration-300 overflow-hidden ${item.status === 'expired'
               ? 'border-red-100 dark:border-red-900/50 hover:shadow-red-100/50 dark:hover:shadow-none grayscale hover:grayscale-0'
               : 'border-slate-200 dark:border-slate-800'
-              }`}>
+              }`}
+              onClick={() => navigate('/scan-result', { state: { product: item } })}
+            >
               <div className="w-full aspect-[4/3] bg-cover bg-center relative" style={{ backgroundImage: `url("${item.image}")` }}>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-70"></div>
                 <div className={`absolute top-3 right-3 backdrop-blur-md px-2.5 py-1 rounded-lg flex items-center gap-1.5 shadow-sm border border-white/10 ${item.status === 'expired' ? 'bg-black/40' : 'bg-black/40'
                   }`}>
                   {item.status === 'expiring' && (
                     <>
-                      <span className="w-2 h-2 rounded-full bg-accent-yellow animate-pulse shadow-[0_0_8px_rgba(217,119,6,0.8)]"></span>
-                      <span className="text-white text-xs font-bold uppercase tracking-wider">Expiring</span>
+                      <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.8)]"></span>
+                      <span className="text-white text-xs font-bold uppercase tracking-wider">Safe</span>
                     </>
                   )}
                   {item.status === 'expired' && (

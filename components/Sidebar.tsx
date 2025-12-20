@@ -10,14 +10,21 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobileMenuOpen, setIsMobileMenuOpen
   const location = useLocation();
   const isInventoryPage = location.pathname === '/inventory';
 
-  const toggleDarkMode = () => {
+  // Initialize theme state based on DOM or localStorage
+  const [isDark, setIsDark] = React.useState(() => {
+    return document.documentElement.classList.contains('dark');
+  });
+
+  const setTheme = (theme: 'light' | 'dark') => {
     const html = document.documentElement;
-    if (html.classList.contains('dark')) {
-      html.classList.remove('dark');
-      localStorage.theme = 'light';
-    } else {
+    if (theme === 'dark') {
       html.classList.add('dark');
       localStorage.theme = 'dark';
+      setIsDark(true);
+    } else {
+      html.classList.remove('dark');
+      localStorage.theme = 'light';
+      setIsDark(false);
     }
   };
 
@@ -99,14 +106,22 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobileMenuOpen, setIsMobileMenuOpen
         </div>
 
         <div className="mt-auto p-6 border-t border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-black/20 backdrop-blur-md animate-fade-in">
-          <div className="flex items-center justify-between mb-6 bg-slate-100 dark:bg-slate-900 p-1.5 rounded-full relative cursor-pointer" onClick={toggleDarkMode}>
-            <div className="flex-1 flex items-center justify-center gap-2 py-2 rounded-full text-xs font-bold z-10 relative transition-colors duration-300 hover:text-amber-500">
+          <div className="flex items-center justify-between mb-6 bg-slate-100 dark:bg-slate-900 p-1.5 rounded-full relative">
+            <div
+              className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-full text-xs font-bold z-10 relative transition-all duration-300 cursor-pointer ${!isDark ? 'bg-white shadow-md text-slate-800' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
+                }`}
+              onClick={() => setTheme('light')}
+            >
               <span className="material-symbols-outlined text-[18px]">light_mode</span>
-              <span className="hidden lg:inline text-slate-700 dark:text-slate-400">Light</span>
+              <span className="hidden lg:inline">Light</span>
             </div>
-            <div className="flex-1 flex items-center justify-center gap-2 py-2 rounded-full text-xs font-bold z-10 relative transition-colors duration-300 hover:text-indigo-400">
+            <div
+              className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-full text-xs font-bold z-10 relative transition-all duration-300 cursor-pointer ${isDark ? 'bg-slate-800 shadow-md text-white' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
+                }`}
+              onClick={() => setTheme('dark')}
+            >
               <span className="material-symbols-outlined text-[18px]">dark_mode</span>
-              <span className="hidden lg:inline text-slate-400 dark:text-slate-200">Dark</span>
+              <span className="hidden lg:inline">Dark</span>
             </div>
           </div>
 
