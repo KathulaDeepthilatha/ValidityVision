@@ -1,16 +1,69 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+
+interface ScanData {
+    name: string;
+    category: string;
+    image: string;
+    status: string;
+    score: number;
+    dates: {
+        expiry: string;
+        manufactured: string;
+        daysLeft: number;
+    };
+    tags: Array<{ label: string; icon: string }>;
+    ingredients: {
+        safe: string[];
+        additives: Array<{ name: string; purpose: string }>;
+    };
+    analysis: {
+        summary: string;
+        verification: string;
+    };
+}
 
 const ScanResult: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { frontImage, backImage, product } = location.state || {}; // Retrieve images or product from state
+    const { frontImage, backImage } = location.state || {};
     const [activeView, setActiveView] = useState<'front' | 'back'>('front');
+    const [scanData, setScanData] = useState<ScanData | null>(null);
+    const [loading, setLoading] = useState(true);
 
-    // Determine the image to show. Default to dynamic frontImage, fallback to product image, then static if missing.
+    useEffect(() => {
+        const fetchScanResult = async () => {
+            try {
+                // In a real app, you might send the images to an API here
+                // For now, we fetch the mock result
+                const response = await fetch('/mock-scan-result.json');
+                const data = await response.json();
+                setScanData(data);
+            } catch (error) {
+                console.error('Error fetching scan result:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchScanResult();
+    }, []);
+
+    // Determine the image to show. Prioritize captured images, then API image.
     const displayImage = activeView === 'front'
-        ? (frontImage || product?.image || "https://lh3.googleusercontent.com/aida-public/AB6AXuBNFXHO5f6c8EtrXHfQPE0BQszR5UlL0HQEcqQdZtxAs-bW6Ikwr2DIR9uynLlpznJ0TKjOPF8XEroQK0GBEyZmCSOFZGZvzAjZSZ6WaRdXYZYgBjCbcPqb7Q5ub_8SvU2ovEL4jz_MqZWz8S1RjYI8eplc8eWTtRXd5Chf89cBYLyeoOWJLi3r18T-swZLAkLaUdsMxVXq_eAa6MJl8_kvqVPFzB_3P0hgRHRUGxWZyPvKtH0TMdzH2KGVSbNKWIEHZ8dI3T_sh3s")
-        : (backImage || frontImage || product?.image || "https://lh3.googleusercontent.com/aida-public/AB6AXuBNFXHO5f6c8EtrXHfQPE0BQszR5UlL0HQEcqQdZtxAs-bW6Ikwr2DIR9uynLlpznJ0TKjOPF8XEroQK0GBEyZmCSOFZGZvzAjZSZ6WaRdXYZYgBjCbcPqb7Q5ub_8SvU2ovEL4jz_MqZWz8S1RjYI8eplc8eWTtRXd5Chf89cBYLyeoOWJLi3r18T-swZLAkLaUdsMxVXq_eAa6MJl8_kvqVPFzB_3P0hgRHRUGxWZyPvKtH0TMdzH2KGVSbNKWIEHZ8dI3T_sh3s");
+        ? (frontImage || scanData?.image || "https://lh3.googleusercontent.com/aida-public/AB6AXuBNFXHO5f6c8EtrXHfQPE0BQszR5UlL0HQEcqQdZtxAs-bW6Ikwr2DIR9uynLlpznJ0TKjOPF8XEroQK0GBEyZmCSOFZGZvzAjZSZ6WaRdXYZYgBjCbcPqb7Q5ub_8SvU2ovEL4jz_MqZWz8S1RjYI8eplc8eWTtRXd5Chf89cBYLyeoOWJLi3r18T-swZLAkLaUdsMxVXq_eAa6MJl8_kvqVPFzB_3P0hgRHRUGxWZyPvKtH0TMdzH2KGVSbNKWIEHZ8dI3T_sh3s")
+        : (backImage || frontImage || scanData?.image || "https://lh3.googleusercontent.com/aida-public/AB6AXuBNFXHO5f6c8EtrXHfQPE0BQszR5UlL0HQEcqQdZtxAs-bW6Ikwr2DIR9uynLlpznJ0TKjOPF8XEroQK0GBEyZmCSOFZGZvzAjZSZ6WaRdXYZYgBjCbcPqb7Q5ub_8SvU2ovEL4jz_MqZWz8S1RjYI8eplc8eWTtRXd5Chf89cBYLyeoOWJLi3r18T-swZLAkLaUdsMxVXq_eAa6MJl8_kvqVPFzB_3P0hgRHRUGxWZyPvKtH0TMdzH2KGVSbNKWIEHZ8dI3T_sh3s");
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-background-light dark:bg-slate-900">
+                <div className="flex flex-col items-center gap-4">
+                    <div className="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
+                    <p className="text-slate-500 font-medium animate-pulse">Analyzing product...</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="flex-1 flex flex-col h-full bg-background-light dark:bg-background-light relative overflow-y-auto">
@@ -30,7 +83,7 @@ const ScanResult: React.FC = () => {
                                     {/* Gradient Overlay */}
                                     <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/30 to-transparent"></div>
 
-                                    {/* Image Toggle Controls - Only show if we actually have images or are testing */}
+                                    {/* Image Toggle Controls */}
                                     <div className="absolute top-4 right-4 flex gap-2 z-20">
                                         <button
                                             onClick={(e) => { e.stopPropagation(); setActiveView('front'); }}
@@ -48,9 +101,9 @@ const ScanResult: React.FC = () => {
                                     <div className="absolute bottom-0 left-0 p-6 w-full">
                                         <p className="text-accent-purple text-xs font-bold uppercase tracking-wider mb-2 flex items-center gap-1">
                                             <span className="size-1.5 bg-accent-purple rounded-full animate-pulse"></span>
-                                            {product?.category || "Dairy Alternatives"}
+                                            {scanData?.category}
                                         </p>
-                                        <h1 className="text-white text-3xl font-display font-bold leading-tight mb-1 drop-shadow-lg">{product?.name || "Organic Almond Milk"}</h1>
+                                        <h1 className="text-white text-3xl font-display font-bold leading-tight mb-1 drop-shadow-lg">{scanData?.name}</h1>
                                         <p className="text-white/80 text-sm font-medium">Nature's Best</p>
                                     </div>
                                 </div>
@@ -65,21 +118,17 @@ const ScanResult: React.FC = () => {
                                     <div className="flex justify-between items-center p-4 bg-background-light rounded-xl border border-slate-200 hover:border-primary/30 transition-colors">
                                         <div className="flex flex-col gap-1">
                                             <span className="text-text-secondary-light text-[11px] uppercase tracking-wider font-semibold">Expiry Date</span>
-                                            <span className="text-text-main-light font-mono font-medium text-xl tracking-tight">Oct 24, 2024</span>
+                                            <span className="text-text-main-light font-mono font-medium text-xl tracking-tight">{scanData?.dates.expiry}</span>
                                         </div>
                                         <div className="text-right">
-                                            {product?.daysLeft !== undefined ? (
-                                                <span className={`inline-block text-xs font-bold px-3 py-1.5 rounded-full border shadow-[0_0_10px_rgba(0,0,0,0.1)] ${product.daysLeft <= 2 ? "text-red-600 bg-red-100 border-red-200" : "text-accent-purple bg-purple-100/50 border-purple-200"}`}>
-                                                    {product.daysLeft} Days Left
-                                                </span>
-                                            ) : (
-                                                <span className="inline-block text-accent-purple text-xs font-bold bg-purple-100/50 border border-purple-200 px-3 py-1.5 rounded-full shadow-[0_0_10px_rgba(168,85,247,0.1)]">14 Days Left</span>
-                                            )}
+                                            <span className={`inline-block text-xs font-bold px-3 py-1.5 rounded-full border shadow-[0_0_10px_rgba(0,0,0,0.1)] ${scanData?.dates.daysLeft && scanData.dates.daysLeft <= 2 ? "text-red-600 bg-red-100 border-red-200" : "text-accent-purple bg-purple-100/50 border-purple-200"}`}>
+                                                {scanData?.dates.daysLeft} Days Left
+                                            </span>
                                         </div>
                                     </div>
                                     <div className="flex justify-between items-center px-1">
                                         <span className="text-text-secondary-light text-sm font-medium">Manufactured</span>
-                                        <span className="text-text-main-light text-sm font-mono opacity-90">Oct 01, 2024</span>
+                                        <span className="text-text-main-light text-sm font-mono opacity-90">{scanData?.dates.manufactured}</span>
                                     </div>
                                     <hr className="border-slate-200" />
                                     <button className="w-full flex items-center justify-center gap-2 bg-text-main-light hover:bg-slate-800 border border-transparent text-white py-3 rounded-xl transition-all duration-300 text-sm font-medium group shadow-md hover:shadow-lg">
@@ -112,9 +161,9 @@ const ScanResult: React.FC = () => {
                                             </span>
                                             <span className="text-primary text-xs font-bold tracking-widest uppercase">Analysis Complete</span>
                                         </div>
-                                        <h2 className="text-4xl md:text-5xl font-display font-bold text-text-main-light tracking-tight drop-shadow-sm">Safe to Consume</h2>
+                                        <h2 className="text-4xl md:text-5xl font-display font-bold text-text-main-light tracking-tight drop-shadow-sm">{scanData?.status}</h2>
                                         <p className="text-text-secondary-light text-base leading-relaxed max-w-lg">
-                                            No harmful ingredients or allergens detected based on your profile settings. This {product ? product.name.toLowerCase() : 'product'} is a <span className="text-text-main-light font-semibold">perfect match</span> for your diet.
+                                            {scanData?.analysis.summary}
                                         </p>
                                     </div>
                                     <div className="flex items-center gap-6">
@@ -124,7 +173,7 @@ const ScanResult: React.FC = () => {
                                                 <circle cx="50%" cy="50%" fill="transparent" r="42%" stroke="#6366f1" strokeDasharray="264" strokeDashoffset="10" strokeLinecap="round" strokeWidth="6"></circle>
                                             </svg>
                                             <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                                <span className="text-4xl font-display font-bold text-text-main-light tracking-tight">98</span>
+                                                <span className="text-4xl font-display font-bold text-text-main-light tracking-tight">{scanData?.score}</span>
                                                 <span className="text-[10px] text-primary uppercase font-bold tracking-widest mt-1">Score</span>
                                             </div>
                                         </div>
@@ -132,12 +181,11 @@ const ScanResult: React.FC = () => {
                                 </div>
                                 <div className="mt-8 pt-6 border-t border-slate-200 flex flex-wrap gap-4 items-center justify-between">
                                     <div className="flex gap-3">
-                                        <span className="px-4 py-1.5 rounded-full bg-white text-text-secondary-light text-xs border border-slate-200 flex items-center gap-2 transition-colors hover:border-primary/30 hover:text-text-main-light cursor-default font-medium">
-                                            <span className="material-symbols-outlined text-[16px] text-primary">check_circle</span> No Allergens
-                                        </span>
-                                        <span className="px-4 py-1.5 rounded-full bg-white text-text-secondary-light text-xs border border-slate-200 flex items-center gap-2 transition-colors hover:border-primary/30 hover:text-text-main-light cursor-default font-medium">
-                                            <span className="material-symbols-outlined text-[16px] text-primary">spa</span> Vegan Friendly
-                                        </span>
+                                        {scanData?.tags.map((tag, index) => (
+                                            <span key={index} className="px-4 py-1.5 rounded-full bg-white text-text-secondary-light text-xs border border-slate-200 flex items-center gap-2 transition-colors hover:border-primary/30 hover:text-text-main-light cursor-default font-medium">
+                                                <span className="material-symbols-outlined text-[16px] text-primary">{tag.icon}</span> {tag.label}
+                                            </span>
+                                        ))}
                                     </div>
                                     <button className="flex-1 md:flex-none md:min-w-[200px] h-12 bg-gradient-to-r from-primary to-primary-dark hover:to-primary text-white text-sm font-bold rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5">
                                         <span className="material-symbols-outlined">inventory_2</span>
@@ -167,9 +215,7 @@ const ScanResult: React.FC = () => {
                                                 <h4 className="text-text-main-light font-medium text-lg mb-1">Safe Ingredients</h4>
                                                 <p className="text-text-secondary-light text-sm mb-4">Core components verified as safe and nutritious.</p>
                                                 <div className="flex flex-wrap gap-2">
-                                                    {[
-                                                        'Almond Base', 'Filtered Water', 'Vitamin D2', 'Calcium Carbonate'
-                                                    ].map((ing, i) => (
+                                                    {scanData?.ingredients.safe.map((ing, i) => (
                                                         <span key={i} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-xs text-slate-600 font-medium">
                                                             {ing} <span className="size-1.5 rounded-full bg-primary shadow-[0_0_5px_#818cf8]"></span>
                                                         </span>
@@ -190,14 +236,12 @@ const ScanResult: React.FC = () => {
                                                 </div>
                                                 <p className="text-text-secondary-light text-sm mb-4">Generally safe, but may cause sensitivity in large quantities.</p>
                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                                    <div className="flex items-center justify-between p-3 rounded-xl bg-white border border-slate-200 hover:border-amber-500/30 transition-colors">
-                                                        <span className="text-sm text-slate-700 font-medium">Gellan Gum</span>
-                                                        <span className="material-symbols-outlined text-text-secondary-light text-[18px] cursor-help hover:text-text-main-light" title="Thickening agent">help</span>
-                                                    </div>
-                                                    <div className="flex items-center justify-between p-3 rounded-xl bg-white border border-slate-200 hover:border-amber-500/30 transition-colors">
-                                                        <span className="text-sm text-slate-700 font-medium">Sunflower Lecithin</span>
-                                                        <span className="material-symbols-outlined text-text-secondary-light text-[18px] cursor-help hover:text-text-main-light" title="Emulsifier">help</span>
-                                                    </div>
+                                                    {scanData?.ingredients.additives.map((additive, i) => (
+                                                        <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-white border border-slate-200 hover:border-amber-500/30 transition-colors">
+                                                            <span className="text-sm text-slate-700 font-medium">{additive.name}</span>
+                                                            <span className="material-symbols-outlined text-text-secondary-light text-[18px] cursor-help hover:text-text-main-light" title={additive.purpose}>help</span>
+                                                        </div>
+                                                    ))}
                                                 </div>
                                             </div>
                                         </div>
@@ -206,7 +250,7 @@ const ScanResult: React.FC = () => {
                                 <div className="p-5 bg-gradient-to-r from-primary/5 to-transparent flex items-center justify-center">
                                     <div className="flex items-center gap-3 opacity-90">
                                         <span className="material-symbols-outlined text-primary">verified_user</span>
-                                        <p className="text-sm text-primary-dark font-medium">No flagged allergens or harmful additives detected.</p>
+                                        <p className="text-sm text-primary-dark font-medium">{scanData?.analysis.verification}</p>
                                     </div>
                                 </div>
                             </div>

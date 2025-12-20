@@ -1,0 +1,44 @@
+{
+    "name": "Organic Almond Milk",
+    "category": "Dairy Alternatives",
+    "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuBNFXHO5f6c8EtrXHfQPE0BQszR5UlL0HQEcqQdZtxAs-bW6Ikwr2DIR9uynLlpznJ0TKjOPF8XEroQK0GBEyZmCSOFZGZvzAjZSZ6WaRdXYZYgBjCbcPqb7Q5ub_8SvU2ovEL4jz_MqZWz8S1RjYI8eplc8eWTtRXd5Chf89cBYLyeoOWJLi3r18T-swZLAkLaUdsMxVXq_eAa6MJl8_kvqVPFzB_3P0hgRHRUGxWZyPvKtH0TMdzH2KGVSbNKWIEHZ8dI3T_sh3s",
+    "status": "Safe to Consume",
+    "score": 98,
+    "dates": {
+        "expiry": "Oct 24, 2024",
+        "manufactured": "Oct 01, 2024",
+        "daysLeft": 14
+    },
+    "tags": [
+        {
+            "label": "No Allergens",
+            "icon": "check_circle"
+        },
+        {
+            "label": "Vegan Friendly",
+            "icon": "spa"
+        }
+    ],
+    "ingredients": {
+        "safe": [
+            "Almond Base",
+            "Filtered Water",
+            "Vitamin D2",
+            "Calcium Carbonate"
+        ],
+        "additives": [
+            {
+                "name": "Gellan Gum",
+                "purpose": "Thickening agent"
+            },
+            {
+                "name": "Sunflower Lecithin",
+                "purpose": "Emulsifier"
+            }
+        ]
+    },
+    "analysis": {
+        "summary": "No harmful ingredients or allergens detected based on your profile settings. This product is a perfect match for your diet.",
+        "verification": "No flagged allergens or harmful additives detected."
+    }
+}

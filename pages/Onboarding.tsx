@@ -52,7 +52,7 @@ const Onboarding: React.FC = () => {
 
   return (
     <div className="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white font-display antialiased selection:bg-primary selection:text-white min-h-screen flex flex-col transition-colors duration-300">
-      <nav className="w-full px-6 py-4 flex items-center justify-between z-50 animate-fade-in">
+      <nav className="w-full px-4 py-3 md:px-6 md:py-4 flex items-center justify-between z-50 animate-fade-in">
         <div className="flex items-center gap-2 group cursor-pointer">
           <div className="relative w-8 h-8 flex items-center justify-center">
             <span className="material-icons-round text-primary text-3xl transition-transform group-hover:rotate-12 duration-300">auto_awesome</span>
@@ -67,7 +67,7 @@ const Onboarding: React.FC = () => {
         </div>
       </nav>
 
-      <main className="flex-grow container mx-auto px-4 lg:px-8 py-4 lg:py-8 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-center">
+      <main className="flex-grow container mx-auto px-4 py-6 lg:px-8 lg:py-8 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-center">
         <div className="hidden lg:block lg:col-span-5 h-[calc(100vh-140px)] min-h-[600px] relative rounded-3xl overflow-hidden shadow-2xl shadow-indigo-200 dark:shadow-black/50 animate-slide-up" style={{ animationDelay: '0.1s' }}>
           <img alt="Hand scanning groceries with smartphone" className="absolute inset-0 w-full h-full object-cover transition-transform duration-[20s] hover:scale-110 ease-linear" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCLop_icuqrVLDxqtGlnBMYaLMY8c-eGCTEe5y7e6alJ9QQAtSx7Rfuw1787Ub6fa23eMXar6s55h4VVzVOLL64SzGwVvSLlYMy57gn8RvFEbg3uVFpEeSfDUG8gZPTtVZ2E3DZzS7HEM1r-KWlaCaHQuvh34FM2vEujlHobSx8Paut8rcvfsNQ3kORKZDELu9B0rE24oyRA1uuSkEQAYwQIKhkKbhOEI8IgfN2Z9ivrKvASdoQmOJ2WlQXrmJsvnBDQAg-JVfPIA8" />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-indigo-900/50 to-transparent mix-blend-multiply"></div>
@@ -96,7 +96,28 @@ const Onboarding: React.FC = () => {
             <span className="text-xs font-bold text-primary uppercase tracking-widest">AI Powered Pantry Tracker</span>
           </div>
 
-          <h2 className="text-4xl lg:text-5xl font-black text-slate-900 dark:text-white mb-6 leading-tight">
+          <div className="block lg:hidden w-full mb-8 rounded-2xl overflow-hidden shadow-lg shadow-indigo-200 dark:shadow-black/50 aspect-video relative group">
+            <img
+              alt="Hand scanning groceries with smartphone"
+              className="absolute inset-0 w-full h-full object-cover"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuCLop_icuqrVLDxqtGlnBMYaLMY8c-eGCTEe5y7e6alJ9QQAtSx7Rfuw1787Ub6fa23eMXar6s55h4VVzVOLL64SzGwVvSLlYMy57gn8RvFEbg3uVFpEeSfDUG8gZPTtVZ2E3DZzS7HEM1r-KWlaCaHQuvh34FM2vEujlHobSx8Paut8rcvfsNQ3kORKZDELu9B0rE24oyRA1uuSkEQAYwQIKhkKbhOEI8IgfN2Z9ivrKvASdoQmOJ2WlQXrmJsvnBDQAg-JVfPIA8"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent"></div>
+            <div className="absolute bottom-0 left-0 w-full p-6 text-white">
+              <div className="flex items-center gap-1.5 mb-2">
+                <span className="material-icons-round text-indigo-300 text-sm animate-pulse-slow">qr_code_scanner</span>
+                <span className="text-[10px] font-bold tracking-widest text-indigo-200 uppercase">AI Powered</span>
+              </div>
+              <h1 className="text-2xl font-extrabold mb-1.5 leading-tight">
+                Scan. Track. Relax.
+              </h1>
+              <p className="text-indigo-100/90 text-sm font-medium leading-relaxed max-w-[90%]">
+                Your smart pantry assistant is ready to help you reduce waste.
+              </p>
+            </div>
+          </div>
+
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-slate-900 dark:text-white mb-6 leading-tight">
             Welcome to <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-indigo-600 dark:from-indigo-400 dark:to-primary">ValidityVision</span>
           </h2>
@@ -114,28 +135,34 @@ const Onboarding: React.FC = () => {
 
           {/* Feature Tabs/Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full">
-            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 hover:border-primary/50 dark:hover:border-primary/50 transition-colors group cursor-default">
-              <div className="w-10 h-10 bg-white dark:bg-slate-700 rounded-lg shadow-sm flex items-center justify-center mb-3 group-hover:scale-110 transition-transform text-primary">
+            <div className="flex flex-row md:flex-col items-center md:items-start gap-4 md:gap-3 p-3 md:p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 hover:border-primary/50 dark:hover:border-primary/50 transition-colors group cursor-default">
+              <div className="w-10 h-10 bg-white dark:bg-slate-700 rounded-lg shadow-sm flex items-center justify-center group-hover:scale-110 transition-transform text-primary shrink-0">
                 <span className="material-icons-round text-xl">verified_user</span>
               </div>
-              <h3 className="font-bold text-slate-900 dark:text-white mb-1">Safety First</h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Instant ingredient analysis</p>
+              <div>
+                <h3 className="font-bold text-slate-900 dark:text-white mb-1">Safety First</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Instant ingredient analysis</p>
+              </div>
             </div>
 
-            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 hover:border-accent-orange/50 dark:hover:border-accent-orange/50 transition-colors group cursor-default">
-              <div className="w-10 h-10 bg-white dark:bg-slate-700 rounded-lg shadow-sm flex items-center justify-center mb-3 group-hover:scale-110 transition-transform text-accent-orange">
+            <div className="flex flex-row md:flex-col items-center md:items-start gap-4 md:gap-3 p-3 md:p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 hover:border-accent-orange/50 dark:hover:border-accent-orange/50 transition-colors group cursor-default">
+              <div className="w-10 h-10 bg-white dark:bg-slate-700 rounded-lg shadow-sm flex items-center justify-center group-hover:scale-110 transition-transform text-accent-orange shrink-0">
                 <span className="material-icons-round text-xl">timer</span>
               </div>
-              <h3 className="font-bold text-slate-900 dark:text-white mb-1">Expiry Tracker</h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Smart notifications</p>
+              <div>
+                <h3 className="font-bold text-slate-900 dark:text-white mb-1">Expiry Tracker</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Smart notifications</p>
+              </div>
             </div>
 
-            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 hover:border-green-500/50 dark:hover:border-green-500/50 transition-colors group cursor-default">
-              <div className="w-10 h-10 bg-white dark:bg-slate-700 rounded-lg shadow-sm flex items-center justify-center mb-3 group-hover:scale-110 transition-transform text-green-500">
+            <div className="flex flex-row md:flex-col items-center md:items-start gap-4 md:gap-3 p-3 md:p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 hover:border-green-500/50 dark:hover:border-green-500/50 transition-colors group cursor-default">
+              <div className="w-10 h-10 bg-white dark:bg-slate-700 rounded-lg shadow-sm flex items-center justify-center group-hover:scale-110 transition-transform text-green-500 shrink-0">
                 <span className="material-icons-round text-xl">devices</span>
               </div>
-              <h3 className="font-bold text-slate-900 dark:text-white mb-1">Sync</h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Access everywhere</p>
+              <div>
+                <h3 className="font-bold text-slate-900 dark:text-white mb-1">Sync</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Access everywhere</p>
+              </div>
             </div>
           </div>
         </div>
@@ -143,8 +170,8 @@ const Onboarding: React.FC = () => {
 
       {/* Sign In Modal */}
       {showModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white dark:bg-slate-800 rounded-3xl p-8 shadow-2xl max-w-md w-full mx-4 border border-slate-200 dark:border-slate-700 scale-100 animate-scale-in relative">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in p-4">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl md:rounded-3xl p-6 md:p-8 shadow-2xl max-w-md w-full border border-slate-200 dark:border-slate-700 scale-100 animate-scale-in relative max-h-[90vh] overflow-y-auto custom-scrollbar">
             <button
               onClick={() => setShowModal(false)}
               className="absolute top-4 right-4 p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full transition-colors"
