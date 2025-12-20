@@ -12,6 +12,7 @@ const ScanProduct: React.FC = () => {
     const [capturedImage, setCapturedImage] = useState<string | null>(null); // Acts as tempImage
     const [error, setError] = useState<string | null>(null);
     const [showRetakeModal, setShowRetakeModal] = useState(false);
+    const [isProcessing, setIsProcessing] = useState(false);
 
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -75,6 +76,77 @@ const ScanProduct: React.FC = () => {
         }
     };
 
+    const processImages = async (front: string, back: string) => {
+        setIsProcessing(true);
+        try {
+            // Placeholder API endpoint
+            const API_URL = 'https://api.validityvision.com/analyze';
+
+            // Clean base64 strings if needed (remove data:image/png;base64, prefix if API expects raw)
+            // For this implementation, we'll send the full data URL string
+
+            const payload = {
+                frontKind: "front",
+                frontImage: front,
+                backKind: "back",
+                backImage: back
+            };
+
+            console.log("Sending request to:", API_URL);
+
+            // Artificial delay to simulate network request for demo purposes completely optional
+            // remove in production if not needed
+            await new Promise(resolve => setTimeout(resolve, 2000));
+
+            let data;
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                data = await response.json();
+            } catch (fetchError) {
+                console.warn("API request failed (expected for placeholder), using mock data:", fetchError);
+                // Fallback Mock Data for demonstration since API doesn't exist yet
+                data = {
+                    success: true,
+                    product: {
+                        name: "Mock Product",
+                        // Use the captured image as the product image
+                        image: front,
+                        category: "Snack",
+                        daysLeft: 7,
+                        status: "Safe"
+                    }
+                };
+            }
+
+            // Navigate to result page with the response data
+            navigate('/scan-result', {
+                state: {
+                    frontImage: front,
+                    backImage: back,
+                    product: data.product,
+                    apiResponse: data
+                }
+            });
+
+        } catch (err) {
+            console.error("Error processing images:", err);
+            setError("Failed to process images. Please try again.");
+        } finally {
+            setIsProcessing(false);
+        }
+    };
+
     const handleConfirm = () => {
         if (scanStep === 'front-review' && capturedImage) {
             setFrontImage(capturedImage);
@@ -82,10 +154,16 @@ const ScanProduct: React.FC = () => {
             setScanStep('back-scan');
             startCamera();
         } else if (scanStep === 'back-review' && capturedImage) {
-            setBackImage(capturedImage);
-            setScanStep('completed');
-            // Navigate with both images
-            navigate('/scan-result', { state: { frontImage: frontImage, backImage: capturedImage } });
+            // Instead of just setting state and navigating, we trigger processing
+            // The back image is 'capturedImage', front is 'frontImage'
+            if (frontImage) {
+                setBackImage(capturedImage);
+                setScanStep('completed');
+                processImages(frontImage, capturedImage);
+            } else {
+                setError("Missing front image. Please restart.");
+                setScanStep('front-scan');
+            }
         }
     };
 
@@ -234,7 +312,7 @@ const ScanProduct: React.FC = () => {
                                         <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-primary"></div>
                                     </div>
                                     <span className="absolute -bottom-6 text-white/70 text-[10px] font-medium tracking-wide whitespace-nowrap">
-                                        {isCameraActive ? 'Tap to Capture' : capturedImage ? 'Processing...' : 'Tap to Capture'}
+                                        {isProcessing ? 'Analyzing...' : isCameraActive ? 'Tap to Capture' : capturedImage ? 'Processing...' : 'Tap to Capture'}
                                     </span>
                                 </div>
                                 {error && (
@@ -262,7 +340,7 @@ const ScanProduct: React.FC = () => {
                                         className="flex items-center justify-center gap-2 py-4 px-8 rounded-full bg-primary text-white shadow-lg hover:shadow-xl hover:bg-primary-dark transition-all font-bold w-full sm:w-auto min-w-[150px]"
                                     >
                                         <span className="material-symbols-outlined">check</span>
-                                        Confirm
+                                        {isProcessing ? 'Processing...' : 'Confirm'}
                                     </button>
                                 </>
                             ) : (
