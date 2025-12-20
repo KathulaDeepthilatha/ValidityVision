@@ -1,11 +1,52 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const Onboarding: React.FC = () => {
   const navigate = useNavigate();
 
+  const [showModal, setShowModal] = useState(false);
+  const [formData, setFormData] = useState({
+    username: '',
+    email: '',
+    password: ''
+  });
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleSignIn = () => {
-    // For frontend demo only - navigate to home
+    setShowModal(true);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      console.log('🚀 Sending Login Request to backend...');
+      console.log('Payload:', JSON.stringify(formData, null, 2));
+
+      const response = await fetch('http://10.10.23.28:3000/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+
+      console.log('✅ Response status:', response.status);
+    } catch (e) {
+      console.warn("⚠️ Backend request failed (this is expected if no server is running on port 3000).");
+      console.warn("Error details:", e);
+    }
+
+    localStorage.setItem('username', formData.username);
+    setIsLoading(false);
+    setShowModal(false);
     navigate('/home');
   };
 
@@ -21,7 +62,7 @@ const Onboarding: React.FC = () => {
         <div className="flex items-center gap-6">
           <a className="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary transition-colors" href="#">Help</a>
           <button onClick={handleSignIn} className="bg-primary hover:bg-primary-hover text-white font-bold py-2.5 px-6 rounded-full shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all transform hover:-translate-y-0.5">
-            Sign In
+            Register
           </button>
         </div>
       </nav>
@@ -65,11 +106,10 @@ const Onboarding: React.FC = () => {
           </p>
 
           <button
-            onClick={handleSignIn}
             className="w-full sm:w-auto px-8 py-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-white font-bold text-lg rounded-xl shadow-lg hover:shadow-xl hover:border-primary dark:hover:border-primary transition-all duration-300 flex items-center justify-center gap-4 group mb-12"
           >
             <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-6 h-6 group-hover:scale-110 transition-transform" />
-            <span>Continue with Google</span>
+            <span>Sign in with Google</span>
           </button>
 
           {/* Feature Tabs/Cards */}
@@ -100,6 +140,82 @@ const Onboarding: React.FC = () => {
           </div>
         </div>
       </main>
+
+      {/* Sign In Modal */}
+      {showModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white dark:bg-slate-800 rounded-3xl p-8 shadow-2xl max-w-md w-full mx-4 border border-slate-200 dark:border-slate-700 scale-100 animate-scale-in relative">
+            <button
+              onClick={() => setShowModal(false)}
+              className="absolute top-4 right-4 p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full transition-colors"
+            >
+              <span className="material-icons-round text-slate-500">close</span>
+            </button>
+
+            <div className="text-center mb-8">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 text-primary mb-4">
+                <span className="material-icons-round text-3xl">person_add</span>
+              </div>
+              <h3 className="text-2xl font-bold text-slate-900 dark:text-white">Create Account</h3>
+              <p className="text-slate-500 dark:text-slate-400">Sign up to access inventory</p>
+            </div>
+
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+              <div>
+                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1.5">Username</label>
+                <input
+                  type="text"
+                  name="username"
+                  value={formData.username}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all font-medium dark:text-white"
+                  placeholder="Enter your username"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1.5">Email</label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all font-medium dark:text-white"
+                  placeholder="hello@example.com"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1.5">Password</label>
+                <input
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all font-medium dark:text-white"
+                  placeholder="••••••••"
+                  required
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="mt-4 w-full py-3.5 px-4 bg-primary hover:bg-primary-hover text-white font-bold rounded-xl shadow-lg shadow-primary/25 hover:shadow-primary/40 transform active:scale-95 transition-all flex items-center justify-center gap-2 group"
+              >
+                {isLoading ? (
+                  <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                ) : (
+                  <>
+                    <span>Register</span>
+                    <span className="material-icons-round group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                  </>
+                )}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

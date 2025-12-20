@@ -79,17 +79,13 @@ const ScanProduct: React.FC = () => {
     const processImages = async (front: string, back: string) => {
         setIsProcessing(true);
         try {
-            // Placeholder API endpoint
-            const API_URL = 'https://api.validityvision.com/analyze';
-
-            // Clean base64 strings if needed (remove data:image/png;base64, prefix if API expects raw)
-            // For this implementation, we'll send the full data URL string
+            // User provided API endpoint
+            const API_URL = 'http://localhost:3000/scan';
 
             const payload = {
-                frontKind: "front",
-                frontImage: front,
-                backKind: "back",
-                backImage: back
+                imageOne: front,
+                imagetwo: back,
+                username: localStorage.getItem('username') || 'Nani'
             };
 
             console.log("Sending request to:", API_URL);
@@ -114,8 +110,8 @@ const ScanProduct: React.FC = () => {
 
                 data = await response.json();
             } catch (fetchError) {
-                console.warn("API request failed (expected for placeholder), using mock data:", fetchError);
-                // Fallback Mock Data for demonstration since API doesn't exist yet
+                console.warn("API request failed (expected if local server not running), using mock data:", fetchError);
+                // Fallback Mock Data for demonstration
                 data = {
                     success: true,
                     product: {
