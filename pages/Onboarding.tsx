@@ -32,7 +32,7 @@ const Onboarding: React.FC = () => {
       console.log('🚀 Sending Login Request to backend...');
       console.log('Payload:', JSON.stringify(formData, null, 2));
 
-      const response = await fetch('http://10.10.23.28:3000/api/auth/register', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)

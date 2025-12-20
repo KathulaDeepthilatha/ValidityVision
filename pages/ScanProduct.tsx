@@ -80,7 +80,7 @@ const ScanProduct: React.FC = () => {
         setIsProcessing(true);
         try {
             // User provided API endpoint
-            const API_URL = 'http://localhost:3000/scan';
+            const API_URL = `${import.meta.env.VITE_API_URL}/scan`;
 
             const payload = {
                 imageOne: front,
