@@ -250,19 +250,39 @@ const ScanResult: React.FC = () => {
                                 </h3>
                                 <div className="flex flex-col gap-5">
                                     <div className="flex justify-between items-center p-4 bg-background-light rounded-xl border border-slate-200 hover:border-primary/30 transition-colors">
-                                        <div className="flex flex-col gap-1">
+                                        <div className="flex flex-col gap-1 flex-1">
                                             <span className="text-text-secondary-light text-[11px] uppercase tracking-wider font-semibold">Expiry Date</span>
-                                            <span className="text-text-main-light font-mono font-medium text-xl tracking-tight">{scanData?.dates.expiry}</span>
+                                            {isEditing ? (
+                                                <input
+                                                    type="text"
+                                                    value={editedData?.dates.expiry || ''}
+                                                    onChange={(e) => handleFieldChange('dates.expiry', e.target.value)}
+                                                    className="text-text-main-light font-mono font-medium text-xl tracking-tight border border-slate-300 rounded px-2 py-1"
+                                                    placeholder="MMM DD, YYYY"
+                                                />
+                                            ) : (
+                                                <span className="text-text-main-light font-mono font-medium text-xl tracking-tight">{displayData?.dates.expiry}</span>
+                                            )}
                                         </div>
                                         <div className="text-right">
-                                            <span className={`inline-block text-xs font-bold px-3 py-1.5 rounded-full border shadow-[0_0_10px_rgba(0,0,0,0.1)] ${scanData?.dates.daysLeft && scanData.dates.daysLeft <= 2 ? "text-red-600 bg-red-100 border-red-200" : "text-accent-purple bg-purple-100/50 border-purple-200"}`}>
-                                                {scanData?.dates.daysLeft} Days Left
+                                            <span className={`inline-block text-xs font-bold px-3 py-1.5 rounded-full border shadow-[0_0_10px_rgba(0,0,0,0.1)] ${displayData?.dates.daysLeft && displayData.dates.daysLeft <= 2 ? "text-red-600 bg-red-100 border-red-200" : "text-accent-purple bg-purple-100/50 border-purple-200"}`}>
+                                                {displayData?.dates.daysLeft} Days Left
                                             </span>
                                         </div>
                                     </div>
                                     <div className="flex justify-between items-center px-1">
                                         <span className="text-text-secondary-light text-sm font-medium">Manufactured</span>
-                                        <span className="text-text-main-light text-sm font-mono opacity-90">{scanData?.dates.manufactured}</span>
+                                        {isEditing ? (
+                                            <input
+                                                type="text"
+                                                value={editedData?.dates.manufactured || ''}
+                                                onChange={(e) => handleFieldChange('dates.manufactured', e.target.value)}
+                                                className="text-text-main-light text-sm font-mono opacity-90 border border-slate-300 rounded px-2 py-1"
+                                                placeholder="MMM DD, YYYY"
+                                            />
+                                        ) : (
+                                            <span className="text-text-main-light text-sm font-mono opacity-90">{displayData?.dates.manufactured}</span>
+                                        )}
                                     </div>
                                     <hr className="border-slate-200" />
                                     <button className="w-full flex items-center justify-center gap-2 bg-text-main-light hover:bg-slate-800 border border-transparent text-white py-3 rounded-xl transition-all duration-300 text-sm font-medium group shadow-md hover:shadow-lg">
@@ -270,14 +290,38 @@ const ScanResult: React.FC = () => {
                                         Set Expiry Reminder
                                     </button>
                                     <div className="grid grid-cols-2 gap-3">
-                                        <button className="flex items-center justify-center gap-2 border border-slate-200 hover:bg-background-light text-text-secondary-light hover:text-text-main-light py-2.5 rounded-xl transition-all text-sm font-medium group">
-                                            <span className="material-symbols-outlined text-[18px] group-hover:text-primary transition-colors">edit</span>
-                                            Edit Details
-                                        </button>
-                                        <button onClick={() => navigate('/scan')} className="flex items-center justify-center gap-2 border border-slate-200 hover:bg-background-light text-text-secondary-light hover:text-text-main-light py-2.5 rounded-xl transition-all text-sm font-medium group">
-                                            <span className="material-symbols-outlined text-[18px] group-hover:text-primary transition-colors">qr_code_scanner</span>
-                                            Rescan
-                                        </button>
+                                        {isEditing ? (
+                                            <>
+                                                <button
+                                                    onClick={handleCancelEdit}
+                                                    className="flex items-center justify-center gap-2 border border-slate-200 hover:bg-slate-100 text-text-secondary-light hover:text-text-main-light py-2.5 rounded-xl transition-all text-sm font-medium group"
+                                                >
+                                                    <span className="material-symbols-outlined text-[18px]">close</span>
+                                                    Cancel
+                                                </button>
+                                                <button
+                                                    onClick={handleSaveEdit}
+                                                    className="flex items-center justify-center gap-2 bg-primary hover:bg-primary-dark text-white py-2.5 rounded-xl transition-all text-sm font-medium group shadow-md"
+                                                >
+                                                    <span className="material-symbols-outlined text-[18px]">save</span>
+                                                    Save Changes
+                                                </button>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <button
+                                                    onClick={handleEditClick}
+                                                    className="flex items-center justify-center gap-2 border border-slate-200 hover:bg-background-light text-text-secondary-light hover:text-text-main-light py-2.5 rounded-xl transition-all text-sm font-medium group"
+                                                >
+                                                    <span className="material-symbols-outlined text-[18px] group-hover:text-primary transition-colors">edit</span>
+                                                    Edit Details
+                                                </button>
+                                                <button onClick={() => navigate('/scan')} className="flex items-center justify-center gap-2 border border-slate-200 hover:bg-background-light text-text-secondary-light hover:text-text-main-light py-2.5 rounded-xl transition-all text-sm font-medium group">
+                                                    <span className="material-symbols-outlined text-[18px] group-hover:text-primary transition-colors">qr_code_scanner</span>
+                                                    Rescan
+                                                </button>
+                                            </>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -295,10 +339,30 @@ const ScanResult: React.FC = () => {
                                             </span>
                                             <span className="text-primary text-xs font-bold tracking-widest uppercase">Analysis Complete</span>
                                         </div>
-                                        <h2 className="text-4xl md:text-5xl font-display font-bold text-text-main-light tracking-tight drop-shadow-sm">{scanData?.status}</h2>
-                                        <p className="text-text-secondary-light text-base leading-relaxed max-w-lg">
-                                            {scanData?.analysis.summary}
-                                        </p>
+                                        {isEditing ? (
+                                            <input
+                                                type="text"
+                                                value={editedData?.status || ''}
+                                                onChange={(e) => handleFieldChange('status', e.target.value)}
+                                                className="text-4xl md:text-5xl font-display font-bold text-text-main-light tracking-tight drop-shadow-sm border border-slate-300 rounded px-3 py-2 w-full"
+                                                placeholder="Product Status"
+                                            />
+                                        ) : (
+                                            <h2 className="text-4xl md:text-5xl font-display font-bold text-text-main-light tracking-tight drop-shadow-sm">{displayData?.status}</h2>
+                                        )}
+                                        {isEditing ? (
+                                            <textarea
+                                                value={editedData?.analysis.summary || ''}
+                                                onChange={(e) => handleFieldChange('analysis.summary', e.target.value)}
+                                                className="text-text-secondary-light text-base leading-relaxed max-w-lg border border-slate-300 rounded px-3 py-2 w-full"
+                                                placeholder="Analysis summary"
+                                                rows={3}
+                                            />
+                                        ) : (
+                                            <p className="text-text-secondary-light text-base leading-relaxed max-w-lg">
+                                                {displayData?.analysis.summary}
+                                            </p>
+                                        )}
                                     </div>
                                     <div className="flex items-center gap-6">
                                         <div className="relative size-32 flex items-center justify-center">
@@ -307,7 +371,18 @@ const ScanResult: React.FC = () => {
                                                 <circle cx="50%" cy="50%" fill="transparent" r="42%" stroke="#6366f1" strokeDasharray="264" strokeDashoffset="10" strokeLinecap="round" strokeWidth="6"></circle>
                                             </svg>
                                             <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                                <span className="text-4xl font-display font-bold text-text-main-light tracking-tight">{scanData?.score}</span>
+                                                {isEditing ? (
+                                                    <input
+                                                        type="number"
+                                                        value={editedData?.score || 0}
+                                                        onChange={(e) => handleFieldChange('score', parseInt(e.target.value) || 0)}
+                                                        className="text-4xl font-display font-bold text-text-main-light tracking-tight text-center w-16 border border-slate-300 rounded"
+                                                        min="0"
+                                                        max="100"
+                                                    />
+                                                ) : (
+                                                    <span className="text-4xl font-display font-bold text-text-main-light tracking-tight">{displayData?.score}</span>
+                                                )}
                                                 <span className="text-[10px] text-primary uppercase font-bold tracking-widest mt-1">Score</span>
                                             </div>
                                         </div>
