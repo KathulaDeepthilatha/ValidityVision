@@ -5,6 +5,7 @@ const Onboarding: React.FC = () => {
   const navigate = useNavigate();
 
   const handleSignIn = () => {
+    // For frontend demo only - navigate to home
     navigate('/home');
   };
 
@@ -44,87 +45,57 @@ const Onboarding: React.FC = () => {
           </div>
         </div>
 
-        <div className="lg:col-span-7 flex flex-col justify-center max-w-2xl mx-auto lg:mx-0 w-full animate-slide-up" style={{ animationDelay: '0.2s' }}>
-          <header className="mb-10">
-            <h2 className="text-4xl md:text-5xl font-extrabold text-slate-900 dark:text-white mb-4 tracking-tight">
-              Simplify Your Pantry.
-            </h2>
-            <p className="text-lg text-slate-500 dark:text-slate-400 leading-relaxed">
-              Seamlessly connect your WhatsApp activity to your personal dashboard to get started.
-            </p>
-          </header>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-            <div onClick={handleSignIn} className="group p-6 rounded-2xl bg-white dark:bg-surface-dark border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-md hover:border-slate-300 dark:hover:border-slate-600 transition-all cursor-pointer relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-4 opacity-50 group-hover:opacity-100 transition-opacity">
-                <span className="material-icons-round text-slate-300 dark:text-slate-600 text-4xl group-hover:scale-110 transition-transform">person_add</span>
-              </div>
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">New Here?</h3>
-              <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 min-h-[40px]">Create a new account using email or social login.</p>
-              <button className="w-full py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-semibold text-sm hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
-                Create Account
-              </button>
-            </div>
-
-            <div onClick={handleSignIn} className="group p-6 rounded-2xl bg-indigo-50/50 dark:bg-indigo-900/10 border-2 border-primary/30 dark:border-primary/20 shadow-sm hover:shadow-md hover:border-primary transition-all cursor-pointer relative">
-              <div className="absolute top-0 right-0 p-4">
-                <span className="material-icons-round text-primary text-4xl group-hover:scale-110 transition-transform">whatsapp</span>
-              </div>
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
-                Have WhatsApp?
-              </h3>
-              <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 min-h-[40px]">Link your existing activity using your phone number.</p>
-              <div className="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-wide">
-                <span className="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-                Recommended
-              </div>
-            </div>
+        <div className="lg:col-span-7 flex flex-col justify-center items-start lg:pl-12 animate-slide-up" style={{ animationDelay: '0.2s' }}>
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800 backdrop-blur-sm mb-6">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+            </span>
+            <span className="text-xs font-bold text-primary uppercase tracking-widest">AI Powered Pantry Tracker</span>
           </div>
 
-          <div className="relative flex py-2 items-center mb-8">
-            <div className="flex-grow border-t border-slate-200 dark:border-slate-700"></div>
-            <span className="flex-shrink-0 mx-4 text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Or quick link via phone</span>
-            <div className="flex-grow border-t border-slate-200 dark:border-slate-700"></div>
-          </div>
+          <h2 className="text-4xl lg:text-5xl font-black text-slate-900 dark:text-white mb-6 leading-tight">
+            Welcome to <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-indigo-600 dark:from-indigo-400 dark:to-primary">ValidityVision</span>
+          </h2>
 
-          <form className="space-y-4 mb-8" onSubmit={(e) => { e.preventDefault(); handleSignIn(); }}>
-            <div className="grid grid-cols-12 gap-4">
-              <div className="col-span-3">
-                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5" htmlFor="code">Code</label>
-                <div className="relative">
-                  <input className="w-full bg-white dark:bg-surface-dark border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-lg rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent py-3 px-4 text-center font-medium transition-shadow outline-none" id="code" type="text" defaultValue="+1" />
-                </div>
-              </div>
-              <div className="col-span-9">
-                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5" htmlFor="phone">WhatsApp Number</label>
-                <div className="relative group">
-                  <input className="w-full bg-white dark:bg-surface-dark border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-lg rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent py-3 px-4 font-medium transition-shadow outline-none placeholder:text-slate-300 dark:placeholder:text-slate-600" id="phone" placeholder="555-0123-4567" type="tel" />
-                  <span className="material-icons-round absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 dark:text-slate-600 group-focus-within:text-primary transition-colors">smartphone</span>
-                </div>
-              </div>
-            </div>
-            <div className="flex items-start gap-2 text-slate-500 dark:text-slate-400 text-sm mb-4">
-              <span className="material-icons-round text-base mt-0.5">info</span>
-              <p>We will send a one-time verification code to your WhatsApp.</p>
-            </div>
-            <button className="w-full bg-primary hover:bg-primary-hover active:bg-indigo-700 text-white font-bold text-lg py-4 rounded-xl shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all transform hover:-translate-y-0.5 flex flex-col sm:flex-row items-center justify-center gap-2 group" type="submit">
-              Send Verification Code
-              <span className="material-icons-round group-hover:translate-x-1 transition-transform">arrow_forward</span>
-            </button>
-          </form>
+          <p className="text-lg text-slate-600 dark:text-slate-300 mb-10 leading-relaxed max-w-lg">
+            Join thousands of users who are saving money and reducing waste. Sign in to sync your inventory across devices.
+          </p>
 
-          <div className="flex flex-wrap gap-x-8 gap-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
-            <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400 text-sm font-medium">
-              <span className="material-icons-round text-primary text-lg">verified_user</span>
-              Secure Data
+          <button
+            onClick={handleSignIn}
+            className="w-full sm:w-auto px-8 py-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-white font-bold text-lg rounded-xl shadow-lg hover:shadow-xl hover:border-primary dark:hover:border-primary transition-all duration-300 flex items-center justify-center gap-4 group mb-12"
+          >
+            <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-6 h-6 group-hover:scale-110 transition-transform" />
+            <span>Continue with Google</span>
+          </button>
+
+          {/* Feature Tabs/Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full">
+            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 hover:border-primary/50 dark:hover:border-primary/50 transition-colors group cursor-default">
+              <div className="w-10 h-10 bg-white dark:bg-slate-700 rounded-lg shadow-sm flex items-center justify-center mb-3 group-hover:scale-110 transition-transform text-primary">
+                <span className="material-icons-round text-xl">verified_user</span>
+              </div>
+              <h3 className="font-bold text-slate-900 dark:text-white mb-1">Safety First</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Instant ingredient analysis</p>
             </div>
-            <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400 text-sm font-medium">
-              <span className="material-icons-round text-primary text-lg">bolt</span>
-              Instant Sync
+
+            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 hover:border-accent-orange/50 dark:hover:border-accent-orange/50 transition-colors group cursor-default">
+              <div className="w-10 h-10 bg-white dark:bg-slate-700 rounded-lg shadow-sm flex items-center justify-center mb-3 group-hover:scale-110 transition-transform text-accent-orange">
+                <span className="material-icons-round text-xl">timer</span>
+              </div>
+              <h3 className="font-bold text-slate-900 dark:text-white mb-1">Expiry Tracker</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Smart notifications</p>
             </div>
-            <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400 text-sm font-medium">
-              <span className="material-icons-round text-primary text-lg">smart_toy</span>
-              AI Analysis
+
+            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 hover:border-green-500/50 dark:hover:border-green-500/50 transition-colors group cursor-default">
+              <div className="w-10 h-10 bg-white dark:bg-slate-700 rounded-lg shadow-sm flex items-center justify-center mb-3 group-hover:scale-110 transition-transform text-green-500">
+                <span className="material-icons-round text-xl">devices</span>
+              </div>
+              <h3 className="font-bold text-slate-900 dark:text-white mb-1">Sync</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Access everywhere</p>
             </div>
           </div>
         </div>
