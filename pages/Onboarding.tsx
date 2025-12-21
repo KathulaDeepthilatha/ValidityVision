@@ -5,6 +5,7 @@ const Onboarding: React.FC = () => {
   const navigate = useNavigate();
 
   const [showModal, setShowModal] = useState(false);
+  const [modalType, setModalType] = useState<'login' | 'register'>('register');
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -12,7 +13,8 @@ const Onboarding: React.FC = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSignIn = () => {
+  const handleSignIn = (type: 'login' | 'register') => {
+    setModalType(type);
     setShowModal(true);
   };
 
@@ -28,29 +30,41 @@ const Onboarding: React.FC = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    try {
-      console.log('🚀 Sending Login Request to backend...');
-      console.log('Payload:', JSON.stringify(formData, null, 2));
+    if (modalType === 'register') {
+      try {
+        console.log('🚀 Sending Register Request to backend...');
+        console.log('Payload:', JSON.stringify(formData, null, 2));
 
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      });
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        });
 
-      console.log('✅ Response status:', response.status);
-    } catch (e) {
-      console.warn("⚠️ Backend request failed (this is expected if no server is running on port 3000).");
-      console.warn("Error details:", e);
+        console.log('✅ Response status:', response.status);
+      } catch (e) {
+        console.warn("⚠️ Backend request failed (this is expected if no server is running on port 3000).");
+        console.warn("Error details:", e);
+      }
+    } else {
+      // Login Logic
+      console.log('🚀 Login initiated...');
     }
 
     // Save user credentials for API requests
-    localStorage.setItem('username', formData.username);
+    if (formData.username) {
+      localStorage.setItem('username', formData.username);
+    } else {
+      localStorage.setItem('username', formData.email.split('@')[0]);
+    }
     localStorage.setItem('userEmail', formData.email);
 
-    setIsLoading(false);
-    setShowModal(false);
-    navigate('/home');
+    // Simulate delay for UX
+    setTimeout(() => {
+      setIsLoading(false);
+      setShowModal(false);
+      navigate('/home');
+    }, 800);
   };
 
   return (
@@ -63,8 +77,10 @@ const Onboarding: React.FC = () => {
           <span className="font-bold text-xl tracking-tight text-slate-900 dark:text-white">ValidityVision</span>
         </div>
         <div className="flex items-center gap-6">
-          <a className="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary transition-colors" href="#">Help</a>
-          <button onClick={handleSignIn} className="bg-primary hover:bg-primary-hover text-white font-bold py-2.5 px-6 rounded-full shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all transform hover:-translate-y-0.5">
+          <button onClick={() => handleSignIn('login')} className="bg-primary hover:bg-primary-hover text-white font-bold py-2.5 px-6 rounded-full shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all transform hover:-translate-y-0.5">
+            Login
+          </button>
+          <button onClick={() => handleSignIn('register')} className="bg-primary hover:bg-primary-hover text-white font-bold py-2.5 px-6 rounded-full shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all transform hover:-translate-y-0.5">
             Register
           </button>
         </div>
@@ -184,25 +200,33 @@ const Onboarding: React.FC = () => {
 
             <div className="text-center mb-8">
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 text-primary mb-4">
-                <span className="material-icons-round text-3xl">person_add</span>
+                <span className="material-icons-round text-3xl">
+                  {modalType === 'register' ? 'person_add' : 'login'}
+                </span>
               </div>
-              <h3 className="text-2xl font-bold text-slate-900 dark:text-white">Create Account</h3>
-              <p className="text-slate-500 dark:text-slate-400">Sign up to access inventory</p>
+              <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
+                {modalType === 'register' ? 'Create Account' : 'Welcome Back'}
+              </h3>
+              <p className="text-slate-500 dark:text-slate-400">
+                {modalType === 'register' ? 'Sign up to access inventory' : 'Sign in to continue'}
+              </p>
             </div>
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-              <div>
-                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1.5">Username</label>
-                <input
-                  type="text"
-                  name="username"
-                  value={formData.username}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all font-medium dark:text-white"
-                  placeholder="Enter your username"
-                  required
-                />
-              </div>
+              {modalType === 'register' && (
+                <div>
+                  <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1.5">Username</label>
+                  <input
+                    type="text"
+                    name="username"
+                    value={formData.username}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all font-medium dark:text-white"
+                    placeholder="Enter your username"
+                    required
+                  />
+                </div>
+              )}
               <div>
                 <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1.5">Email</label>
                 <input
@@ -237,7 +261,7 @@ const Onboarding: React.FC = () => {
                   <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
                 ) : (
                   <>
-                    <span>Register</span>
+                    <span>{modalType === 'register' ? 'Register' : 'Login'}</span>
                     <span className="material-icons-round group-hover:translate-x-1 transition-transform">arrow_forward</span>
                   </>
                 )}

@@ -22,7 +22,43 @@ interface ScanData {
         summary: string;
         verification: string;
     };
+
 }
+
+// Helper to create a small thumbnail for localStorage
+const createThumbnail = (base64Image: string): Promise<string> => {
+    return new Promise((resolve) => {
+        if (!base64Image) {
+            resolve('');
+            return;
+        }
+        const img = new Image();
+        img.src = base64Image;
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const maxWidth = 300; // Small width for thumbnails
+            let width = img.width;
+            let height = img.height;
+
+            if (width > maxWidth) {
+                height = (height * maxWidth) / width;
+                width = maxWidth;
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            if (ctx) {
+                ctx.drawImage(img, 0, 0, width, height);
+                // Use JPEG with 0.6 quality for maximum compression
+                resolve(canvas.toDataURL('image/jpeg', 0.6));
+            } else {
+                resolve(base64Image);
+            }
+        };
+        img.onerror = () => resolve(base64Image); // Fallback
+    });
+};
 
 const ScanResult: React.FC = () => {
     const navigate = useNavigate();
@@ -34,6 +70,7 @@ const ScanResult: React.FC = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [editedData, setEditedData] = useState<ScanData | null>(null);
     const [scanId, setScanId] = useState<number | null>(null);
+    const [isAdded, setIsAdded] = useState(false);
 
     const calculateExpiryDate = (manufacturedDate: string, bestBefore: string): string => {
         try {
@@ -82,21 +119,6 @@ const ScanResult: React.FC = () => {
                 }
 
                 setScanData(data);
-
-                // Store scan result in localStorage for inventory
-                const existingScans = JSON.parse(localStorage.getItem('scanHistory') || '[]');
-                const scanIdentifier = Date.now();
-                const newScan = {
-                    id: scanIdentifier,
-                    timestamp: new Date().toISOString(),
-                    frontImage,
-                    backImage,
-                    data
-                };
-                existingScans.unshift(newScan);
-                localStorage.setItem('scanHistory', JSON.stringify(existingScans));
-                setScanId(scanIdentifier);
-
             } catch (error) {
                 console.error('Error processing scan result:', error);
             } finally {
@@ -122,17 +144,53 @@ const ScanResult: React.FC = () => {
 
         // Update the current scan data
         setScanData(editedData);
-
-        // Update in localStorage
-        const existingScans = JSON.parse(localStorage.getItem('scanHistory') || '[]');
-        const scanIndex = existingScans.findIndex((scan: any) => scan.id === scanId);
-
-        if (scanIndex !== -1) {
-            existingScans[scanIndex].data = editedData;
-            localStorage.setItem('scanHistory', JSON.stringify(existingScans));
-        }
-
         setIsEditing(false);
+    };
+
+
+    const handleAddToPantry = async () => {
+        if (!scanData || isAdded) return;
+
+        setIsAdded(true); // Prevent multiple clicks immediately
+
+        try {
+            // Compress images before saving to avoid LocalStorage limits
+            // The original images are likely huge PNGs from canvas
+            // Use frontImage (captured) if available, otherwise fallback to API image
+            const thumbFront = await createThumbnail(frontImage || scanData.image);
+            const thumbBack = await createThumbnail(backImage || "");
+
+            const existingScans = JSON.parse(localStorage.getItem('scanHistory') || '[]');
+            const newScan = {
+                id: Date.now(),
+                timestamp: new Date().toISOString(),
+                frontImage: thumbFront,
+                backImage: thumbBack,
+                data: scanData
+            };
+
+            // Add to beginning of array
+            existingScans.unshift(newScan);
+
+            // Allow up to 20 items, remove oldest if needed to save space
+            if (existingScans.length > 20) {
+                existingScans.length = 20;
+            }
+
+            localStorage.setItem('scanHistory', JSON.stringify(existingScans));
+
+            alert("Product added successfully!");
+            navigate('/inventory');
+        } catch (e) {
+            console.error("Storage error:", e);
+            setIsAdded(false); // Re-enable if failed
+            if (e instanceof DOMException &&
+                (e.code === 22 || e.code === 1014 || e.name === 'QuotaExceededError' || e.name === 'NS_ERROR_DOM_QUOTA_REACHED')) {
+                alert("Storage full! Please delete older items from inventory to make space.");
+            } else {
+                alert("Failed to save product. Please try again.");
+            }
+        }
     };
 
     const handleFieldChange = (field: string, value: any) => {
@@ -396,9 +454,13 @@ const ScanResult: React.FC = () => {
                                             </span>
                                         ))}
                                     </div>
-                                    <button className="flex-1 md:flex-none md:min-w-[200px] h-12 bg-gradient-to-r from-primary to-primary-dark hover:to-primary text-white text-sm font-bold rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5">
-                                        <span className="material-symbols-outlined">inventory_2</span>
-                                        Add to Pantry
+                                    <button
+                                        onClick={handleAddToPantry}
+                                        disabled={isAdded}
+                                        className={`flex-1 md:flex-none md:min-w-[200px] h-12 text-white text-sm font-bold rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 ${isAdded ? 'bg-slate-400 cursor-not-allowed' : 'bg-gradient-to-r from-primary to-primary-dark hover:to-primary'}`}
+                                    >
+                                        <span className="material-symbols-outlined">{isAdded ? 'check' : 'inventory_2'}</span>
+                                        {isAdded ? 'Added to Pantry' : 'Add to Pantry'}
                                     </button>
                                 </div>
                             </div>

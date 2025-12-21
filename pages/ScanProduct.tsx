@@ -38,6 +38,18 @@ const ScanProduct: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [showRetakeModal, setShowRetakeModal] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
+    const [recentScans, setRecentScans] = useState<any[]>([]);
+
+    useEffect(() => {
+        try {
+            const history = JSON.parse(localStorage.getItem('scanHistory') || '[]');
+            // Sort by date if available, or just reverse to show newest first
+            // assuming push() was used, so last is newest. Reverse it.
+            setRecentScans(history.reverse().slice(0, 3));
+        } catch (e) {
+            console.error("Failed to load recent scans", e);
+        }
+    }, []);
 
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -412,43 +424,53 @@ const ScanProduct: React.FC = () => {
                         <div className="flex-1 bg-surface-card-light dark:bg-surface-card-dark rounded-3xl p-6 border border-slate-200 dark:border-slate-700 shadow-soft flex flex-col">
                             <div className="flex items-center justify-between mb-4">
                                 <h3 className="font-bold text-text-main-light dark:text-text-main-dark">Recent Scans</h3>
-                                <button className="text-xs text-primary font-semibold hover:underline">View All</button>
+                                {recentScans.length > 0 && (
+                                    <button onClick={() => navigate('/inventory')} className="text-xs text-primary font-semibold hover:underline">View All</button>
+                                )}
                             </div>
-                            <div className="flex flex-col gap-3 overflow-y-auto custom-scrollbar pr-2 -mr-2">
-                                <div className="group flex items-center gap-3 p-3 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer border border-transparent hover:border-slate-200 dark:hover:border-slate-700">
-                                    <div className="w-12 h-12 rounded-xl bg-cover bg-center shrink-0 shadow-sm group-hover:scale-105 transition-transform" style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDtUGd_KdY_7bpP9Cmz8Q8n16PXuLNeabjqYkuBYrDjfhyT5u8T0D4XvqweU2TVCpum0ukJRVbvYuYZZwlP270LnmlceABE5igrS2AsHUBbDCCMPCwCJu3OdNtnPTZB-Ck5NFSoB-KiQ_ULlw_jjX1w8aEyOhDud63g0VcHztqF6kYNf9ZvmJ4jtMR_D26fGapYdIxBMnUK8BBN1isdttB8B8jbLofemm0uNXN0qpEH_7QdtZRqJSXMOUBCLj2wiYFb5H4M9sVb1sA")' }}></div>
-                                    <div className="flex flex-col min-w-0">
-                                        <p className="text-sm font-bold text-text-main-light dark:text-text-main-dark truncate group-hover:text-primary transition-colors">Greek Yogurt</p>
-                                        <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark">Scanned 2m ago</p>
-                                    </div>
-                                    <div className="ml-auto w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-400 group-hover:bg-primary group-hover:text-white transition-all">
-                                        <span className="material-symbols-outlined text-lg">arrow_forward</span>
-                                    </div>
-                                </div>
-                                <div className="group flex items-center gap-3 p-3 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer border border-transparent hover:border-slate-200 dark:hover:border-slate-700">
-                                    <div className="w-12 h-12 rounded-xl bg-cover bg-center shrink-0 shadow-sm group-hover:scale-105 transition-transform relative overflow-hidden">
-                                        <div className="absolute inset-0 bg-pink-100 dark:bg-pink-900/30 flex items-center justify-center">
-                                            <span className="material-symbols-outlined text-pink-500 text-xl">face</span>
+
+                            <div className="flex flex-col gap-3 overflow-y-auto custom-scrollbar pr-2 -mr-2 flex-1">
+                                {recentScans.length === 0 ? (
+                                    <div className="flex flex-col items-center justify-center h-full py-8 text-center opacity-70">
+                                        <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-3 animate-pulse">
+                                            <span className="material-symbols-outlined text-3xl text-slate-400">qr_code_scanner</span>
                                         </div>
+                                        <p className="text-sm font-bold text-text-main-light dark:text-text-main-dark mb-1">No scans yet</p>
+                                        <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark max-w-[200px]">
+                                            Start scanning products to build your digital pantry!
+                                        </p>
                                     </div>
-                                    <div className="flex flex-col min-w-0">
-                                        <p className="text-sm font-bold text-text-main-light dark:text-text-main-dark truncate group-hover:text-primary transition-colors">Face Moisturizer</p>
-                                        <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark">Scanned 15m ago</p>
-                                    </div>
-                                    <div className="ml-auto w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-400 group-hover:bg-primary group-hover:text-white transition-all">
-                                        <span className="material-symbols-outlined text-lg">arrow_forward</span>
-                                    </div>
-                                </div>
-                                <div className="group flex items-center gap-3 p-3 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer border border-transparent hover:border-slate-200 dark:hover:border-slate-700">
-                                    <div className="w-12 h-12 rounded-xl bg-cover bg-center shrink-0 shadow-sm group-hover:scale-105 transition-transform" style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuA_P1louIyjYkuCJSWSvtVEvGzgQfqGehYvbzmHKDQvq75RhP86YnQh8Bx6LilAMUkAohGCx8Eu7IvgQ3dyOhmVcOoiOxAijdcvUwPqVBQVI722ToIJBPSu-Jg_X0OeFYKwddkkdz2m1RWnVr486VWDCqRL7XokOSTv9h6Lwu1UN7u3FAhZjam0EwB1w2iysfaox2Z-bdEAgXfZbU6BobezhkvVWzV5HxoeKl-c4wqTrbxNCot40SGWZVtp51K-S6X3VWBesvvtJ_g")' }}></div>
-                                    <div className="flex flex-col min-w-0">
-                                        <p className="text-sm font-bold text-text-main-light dark:text-text-main-dark truncate group-hover:text-primary transition-colors">Organic Milk</p>
-                                        <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark">Scanned 1h ago</p>
-                                    </div>
-                                    <div className="ml-auto w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-400 group-hover:bg-primary group-hover:text-white transition-all">
-                                        <span className="material-symbols-outlined text-lg">arrow_forward</span>
-                                    </div>
-                                </div>
+                                ) : (
+                                    recentScans.map((scan, index) => (
+                                        <div
+                                            key={index}
+                                            onClick={() => navigate('/scan-result', {
+                                                state: {
+                                                    frontImage: scan.frontImage,
+                                                    backImage: scan.backImage,
+                                                    scanData: scan.data
+                                                }
+                                            })}
+                                            className="group flex items-center gap-3 p-3 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer border border-transparent hover:border-slate-200 dark:hover:border-slate-700"
+                                        >
+                                            <div
+                                                className="w-12 h-12 rounded-xl bg-cover bg-center shrink-0 shadow-sm group-hover:scale-105 transition-transform bg-slate-200 dark:bg-slate-700"
+                                                style={{ backgroundImage: `url("${scan.frontImage || scan.data?.image || 'https://via.placeholder.com/150'}")` }}
+                                            ></div>
+                                            <div className="flex flex-col min-w-0">
+                                                <p className="text-sm font-bold text-text-main-light dark:text-text-main-dark truncate group-hover:text-primary transition-colors">
+                                                    {scan.data?.name || "Unknown Product"}
+                                                </p>
+                                                <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark">
+                                                    {scan.timestamp ? new Date(scan.timestamp).toLocaleDateString() : 'Recently'}
+                                                </p>
+                                            </div>
+                                            <div className="ml-auto w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-400 group-hover:bg-primary group-hover:text-white transition-all">
+                                                <span className="material-symbols-outlined text-lg">arrow_forward</span>
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
                             </div>
                         </div>
                     </div>

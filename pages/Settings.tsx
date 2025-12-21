@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Settings: React.FC = () => {
+    const navigate = useNavigate();
     // State for profile
     const [displayName, setDisplayName] = useState("Nani");
     const [bio, setBio] = useState("Food enthusiast & sustainability advocate.");
@@ -58,6 +60,13 @@ const Settings: React.FC = () => {
         }
     };
 
+    const handleLogout = () => {
+        if (window.confirm("Are you sure you want to logout?")) {
+            localStorage.clear();
+            navigate('/');
+        }
+    };
+
     return (
         <div className="flex-1 flex flex-col h-full relative overflow-hidden bg-background-light dark:bg-background-dark transition-colors duration-500 z-10">
             <header className="w-full px-4 md:px-10 py-6 md:py-8 flex flex-col md:flex-row justify-between items-start md:items-end shrink-0 z-20 relative animate-fade-in gap-4">
@@ -66,9 +75,12 @@ const Settings: React.FC = () => {
                     <p className="text-text-secondary-light dark:text-text-secondary-dark text-sm md:text-base font-normal">Manage your preferences, profile details, and security settings.</p>
                 </div>
                 <div className="flex gap-3">
-                    <button className="bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-text-secondary-light dark:text-text-secondary-dark border border-slate-200 dark:border-slate-700 shadow-sm rounded-xl px-5 py-2.5 text-sm font-semibold transition-all hover:scale-105 active:scale-95 flex items-center gap-2 group">
-                        <span className="material-symbols-outlined text-[20px] group-hover:text-primary transition-colors">help</span>
-                        Help
+                    <button
+                        onClick={handleLogout}
+                        className="bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-text-secondary-light dark:text-text-secondary-dark border border-slate-200 dark:border-slate-700 shadow-sm rounded-xl px-5 py-2.5 text-sm font-semibold transition-all hover:scale-105 active:scale-95 flex items-center gap-2 group"
+                    >
+                        <span className="material-symbols-outlined text-[20px] group-hover:text-primary transition-colors">logout</span>
+                        Logout
                     </button>
                     <button
                         onClick={handleSave}

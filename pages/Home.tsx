@@ -88,7 +88,7 @@ const Home: React.FC = () => {
         </div>
       </div>
 
-      <div className="px-4 md:px-12 pb-16 max-w-7xl mx-auto w-full animate-slide-up" style={{ animationDelay: '500ms' }}>
+      {/* <div className="px-4 md:px-12 pb-16 max-w-7xl mx-auto w-full animate-slide-up" style={{ animationDelay: '500ms' }}>
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-2xl font-bold text-text-main-light dark:text-text-main-dark">Quick Stats</h2>
           <button onClick={() => navigate('/inventory')} className="text-sm font-medium text-primary hover:text-primary-hover transition-colors">View Inventory</button>
@@ -131,7 +131,7 @@ const Home: React.FC = () => {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
 
       <footer className="mt-auto py-8 text-center text-text-secondary-light dark:text-text-secondary-dark text-sm animate-fade-in" style={{ animationDelay: '500ms' }}>
         <p className="opacity-70 hover:opacity-100 transition-opacity">© 2025 ValidityVision Hackathon Project</p>

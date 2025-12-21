@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 
 interface SidebarProps {
   isMobileMenuOpen: boolean;
@@ -8,7 +8,9 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const isInventoryPage = location.pathname === '/inventory';
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = React.useState(false);
 
   // Initialize theme state based on DOM or localStorage
   const [isDark, setIsDark] = React.useState(() => {
@@ -34,6 +36,21 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobileMenuOpen, setIsMobileMenuOpen
     { path: '/inventory', icon: 'inventory_2', label: 'Pantry' },
     { path: '/settings', icon: 'settings', label: 'Settings' },
   ];
+
+  const handleLogout = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (window.confirm("Are you sure you want to logout?")) {
+      localStorage.clear();
+      navigate('/');
+    }
+    setIsProfileMenuOpen(false);
+  };
+
+  const handleProfileClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigate('/settings');
+    setIsProfileMenuOpen(false);
+  };
 
   return (
     <>
@@ -125,16 +142,52 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobileMenuOpen, setIsMobileMenuOpen
             </div>
           </div>
 
-          <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/80 dark:bg-slate-800/80 hover:bg-white dark:hover:bg-slate-800 cursor-pointer transition-all hover:scale-[1.02] border border-slate-200 dark:border-slate-700 shadow-sm group">
-            <div
-              className="bg-center bg-no-repeat bg-cover rounded-full size-10 ring-2 ring-slate-100 dark:ring-slate-700 shadow-sm group-hover:ring-primary/50 transition-all"
-              style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDaJgw7RZUqVODu7alZtmmjrC5Q_VpUuwqO7XSEGk2gnFL84TExeG1RjPLQx8X1pSsju_lcY7dkAyonIH6Z747SZrCTi4q3EV4QxKp-9_jSJhSjKa_0r0U8VIYszpVZREuiobbF1s0bw9HdRgQrMJLivdzJW_zT4QylNjX_MBmDFv7jOOcFrydPumdv_MEz3mqH4eQoPQeiedNnLesbg2IlxqsmyzJd82PEtrnVO24Ab6WBm1RFN4lg3kcwxBQo8URrL5bsPGvw7lQ")' }}
-            ></div>
-            <div className="flex flex-col overflow-hidden">
-              <p className="text-text-main-light dark:text-text-main-dark text-sm font-bold leading-none truncate group-hover:text-primary transition-colors">Nani</p>
-              <p className="text-text-secondary-light dark:text-text-secondary-dark text-xs mt-1 truncate">Premium Plan</p>
+          <div className="relative">
+            {isProfileMenuOpen && (
+              <>
+                <div
+                  className="fixed inset-0 z-10"
+                  onClick={() => setIsProfileMenuOpen(false)}
+                ></div>
+                <div className="absolute bottom-full right-0 mb-3 w-48 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden z-20 animate-scale-in origin-bottom-right">
+                  <button
+                    onClick={handleProfileClick}
+                    className="w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors text-sm font-medium text-text-main-light dark:text-text-main-dark"
+                  >
+                    <span className="material-symbols-outlined text-[20px] text-primary">person</span>
+                    Profile
+                  </button>
+                  <div className="h-px bg-slate-100 dark:bg-slate-700/50"></div>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors text-sm font-medium text-red-500"
+                  >
+                    <span className="material-symbols-outlined text-[20px]">logout</span>
+                    Logout
+                  </button>
+                </div>
+              </>
+            )}
+
+            <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/80 dark:bg-slate-800/80 hover:bg-white dark:hover:bg-slate-800 transition-all hover:scale-[1.02] border border-slate-200 dark:border-slate-700 shadow-sm group relative z-10">
+              <div
+                className="bg-center bg-no-repeat bg-cover rounded-full size-10 ring-2 ring-slate-100 dark:ring-slate-700 shadow-sm group-hover:ring-primary/50 transition-all"
+                style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDaJgw7RZUqVODu7alZtmmjrC5Q_VpUuwqO7XSEGk2gnFL84TExeG1RjPLQx8X1pSsju_lcY7dkAyonIH6Z747SZrCTi4q3EV4QxKp-9_jSJhSjKa_0r0U8VIYszpVZREuiobbF1s0bw9HdRgQrMJLivdzJW_zT4QylNjX_MBmDFv7jOOcFrydPumdv_MEz3mqH4eQoPQeiedNnLesbg2IlxqsmyzJd82PEtrnVO24Ab6WBm1RFN4lg3kcwxBQo8URrL5bsPGvw7lQ")' }}
+              ></div>
+              <div className="flex flex-col overflow-hidden">
+                <p className="text-text-main-light dark:text-text-main-dark text-sm font-bold leading-none truncate group-hover:text-primary transition-colors">Nani</p>
+                <p className="text-text-secondary-light dark:text-text-secondary-dark text-xs mt-1 truncate">Premium Plan</p>
+              </div>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsProfileMenuOpen(!isProfileMenuOpen);
+                }}
+                className="ml-auto p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+              >
+                <span className="material-symbols-outlined text-text-secondary-light dark:text-text-secondary-dark text-lg group-hover:text-primary transition-colors">more_vert</span>
+              </button>
             </div>
-            <span className="material-symbols-outlined text-text-secondary-light dark:text-text-secondary-dark ml-auto text-lg group-hover:text-primary transition-colors">more_vert</span>
           </div>
         </div>
       </aside>

@@ -7,7 +7,9 @@ interface InventoryItem {
   category: string;
   image: string;
   daysLeft?: number;
+  expiryDate?: string;
   status: 'fresh' | 'expiring' | 'expired' | 'consumed';
+  originalData?: any;
 }
 
 import { SidebarContext } from '../App';
@@ -23,40 +25,56 @@ const Inventory: React.FC = () => {
 
   // Load scan history from localStorage
   useEffect(() => {
-    const loadInventory = () => {
+    const loadInventory = async () => {
       try {
-        const scanHistory = JSON.parse(localStorage.getItem('scanHistory') || '[]');
+        const userEmail = localStorage.getItem('userEmail');
+        if (!userEmail) {
+          console.warn("No user email found, skipping API fetch.");
+          setInventoryItems([]);
+          return;
+        }
 
-        const items: InventoryItem[] = scanHistory.map((scan: any, index: number) => {
-          const scanData = scan.data;
+        const response = await fetch(`http://localhost:8080/api/products/${userEmail}`);
+        const data = await response.json();
 
-          // Determine status based on days left
-          let status: 'fresh' | 'expiring' | 'expired' | 'consumed' = 'fresh';
-          const daysLeft = scanData?.dates?.daysLeft;
-
-          if (daysLeft !== undefined && daysLeft !== null) {
-            if (daysLeft < 0) {
-              status = 'expired';
-            } else if (daysLeft <= 3) {
-              status = 'expiring';
-            } else {
-              status = 'fresh';
+        if (data.success && Array.isArray(data.data)) {
+          const items: InventoryItem[] = data.data.map((product: any) => {
+            // Calculate days left if not provided directly
+            let daysLeft = product.dates?.daysLeft;
+            if (daysLeft === undefined && product.dates?.expiry) {
+              const expiry = new Date(product.dates.expiry);
+              const today = new Date();
+              const diffTime = expiry.getTime() - today.getTime();
+              daysLeft = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
             }
-          }
 
-          return {
-            id: scan.id?.toString() || `scan-${index}`,
-            name: scanData?.name || 'Unknown Product',
-            category: scanData?.category || 'Uncategorized',
-            image: scanData?.image || scan.frontImage || 'https://via.placeholder.com/400',
-            daysLeft: daysLeft,
-            status: status
-          };
-        });
+            // Determine status
+            let status: 'fresh' | 'expiring' | 'expired' | 'consumed' = 'fresh';
+            if (daysLeft !== undefined) {
+              if (daysLeft < 0) status = 'expired';
+              else if (daysLeft <= 3) status = 'expiring';
+              else status = 'fresh';
+            }
 
-        setInventoryItems(items);
+            return {
+              id: product._id,
+              name: product.name,
+              category: product.category,
+              image: product.image,
+              daysLeft: daysLeft,
+              expiryDate: product.dates?.expiry,
+              status: status,
+              originalData: product
+            };
+          });
+          setInventoryItems(items);
+        } else {
+          console.error("Failed to fetch products or invalid data format");
+          setInventoryItems([]);
+        }
       } catch (error) {
-        console.error('Error loading inventory:', error);
+        console.error('Error loading inventory from API:', error);
+        // Fallback to empty or localStorage if desired, but user asked to use API
         setInventoryItems([]);
       }
     };
@@ -197,22 +215,18 @@ const Inventory: React.FC = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8">
           {currentItems.map(item => {
-            // Find the original scan data for this item
-            const scanHistory = JSON.parse(localStorage.getItem('scanHistory') || '[]');
-            const originalScan = scanHistory.find((scan: any) => scan.id?.toString() === item.id);
-
             return (
               <div key={item.id} className={`group relative flex flex-col rounded-2xl bg-surface-card-light dark:bg-surface-card-dark border shadow-card hover:shadow-hover hover:-translate-y-1 transition-all duration-300 overflow-hidden ${item.status === 'expired'
                 ? 'border-red-100 dark:border-red-900/50 hover:shadow-red-100/50 dark:hover:shadow-none grayscale hover:grayscale-0'
                 : 'border-slate-200 dark:border-slate-800'
                 }`}
                 onClick={() => {
-                  if (originalScan) {
+                  if (item.originalData) {
                     navigate('/scan-result', {
                       state: {
-                        frontImage: originalScan.frontImage,
-                        backImage: originalScan.backImage,
-                        scanData: originalScan.data
+                        frontImage: item.image,
+                        backImage: item.image, // API might not have back image separate
+                        scanData: item.originalData
                       }
                     });
                   }
@@ -257,14 +271,22 @@ const Inventory: React.FC = () => {
                   </div>
                   <div className="mt-auto">
                     {/* Render different footer content based on status */}
-                    {item.status === 'expiring' && (
+                    {(item.status === 'expiring' || item.status === 'fresh') && (
                       <>
-                        <div className="flex justify-between items-center mb-2">
+                        <div className="flex justify-between items-center mb-5">
                           <span className="text-text-secondary-light dark:text-text-secondary-dark text-xs font-medium">Expires in</span>
-                          <span className="text-accent-yellow text-sm font-bold bg-amber-50 dark:bg-amber-900/30 px-2 py-0.5 rounded">{item.daysLeft} {item.daysLeft === 1 ? 'day' : 'days'}</span>
+                          <span className={`text-sm font-bold px-2 py-0.5 rounded ${item.status === 'expiring'
+                            ? 'text-accent-yellow bg-amber-50 dark:bg-amber-900/30'
+                            : 'text-green-600 bg-green-50 dark:bg-green-900/30'
+                            }`}>
+                            {item.daysLeft} {item.daysLeft === 1 ? 'day' : 'days'} left
+                          </span>
                         </div>
                         <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden mb-5">
-                          <div className="h-full bg-accent-yellow rounded-full" style={{ width: `${(item.daysLeft || 0) * 15}%` }}></div>
+                          <div
+                            className={`h-full rounded-full ${item.status === 'expiring' ? 'bg-accent-yellow' : 'bg-green-500'}`}
+                            style={{ width: `${Math.min((item.daysLeft || 0) * 10, 100)}%` }} // Adjusted scale for fresh items
+                          ></div>
                         </div>
                         <button className="flex-1 w-full py-2.5 rounded-xl bg-primary dark:bg-primary-dark text-white text-sm font-bold hover:bg-primary-dark dark:hover:bg-primary shadow-lg shadow-primary/20 transition-all">
                           Consume
@@ -307,46 +329,48 @@ const Inventory: React.FC = () => {
         </div>
 
         {/* Pagination Controls */}
-        {totalPages > 1 && (
-          <div className="flex justify-center items-center gap-2 mt-12 mb-4">
-            <button
-              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-              className={`p-2 rounded-xl transition-colors ${currentPage === 1
-                ? 'text-slate-300 dark:text-slate-700 cursor-not-allowed'
-                : 'text-text-secondary-light dark:text-text-secondary-dark hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-primary'
-                }`}
-            >
-              <span className="material-symbols-outlined">chevron_left</span>
-            </button>
+        {
+          totalPages > 1 && (
+            <div className="flex justify-center items-center gap-2 mt-12 mb-4">
+              <button
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className={`p-2 rounded-xl transition-colors ${currentPage === 1
+                  ? 'text-slate-300 dark:text-slate-700 cursor-not-allowed'
+                  : 'text-text-secondary-light dark:text-text-secondary-dark hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-primary'
+                  }`}
+              >
+                <span className="material-symbols-outlined">chevron_left</span>
+              </button>
 
-            <div className="flex items-center gap-1">
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(number => (
-                <button
-                  key={number}
-                  onClick={() => paginate(number)}
-                  className={`w-10 h-10 rounded-xl text-sm font-bold transition-all ${currentPage === number
-                    ? 'bg-primary text-white shadow-lg shadow-primary/25'
-                    : 'text-text-secondary-light dark:text-text-secondary-dark hover:bg-slate-50 dark:hover:bg-slate-800'
-                    }`}
-                >
-                  {number}
-                </button>
-              ))}
+              <div className="flex items-center gap-1">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(number => (
+                  <button
+                    key={number}
+                    onClick={() => paginate(number)}
+                    className={`w-10 h-10 rounded-xl text-sm font-bold transition-all ${currentPage === number
+                      ? 'bg-primary text-white shadow-lg shadow-primary/25'
+                      : 'text-text-secondary-light dark:text-text-secondary-dark hover:bg-slate-50 dark:hover:bg-slate-800'
+                      }`}
+                  >
+                    {number}
+                  </button>
+                ))}
+              </div>
+
+              <button
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+                className={`p-2 rounded-xl transition-colors ${currentPage === totalPages
+                  ? 'text-slate-300 dark:text-slate-700 cursor-not-allowed'
+                  : 'text-text-secondary-light dark:text-text-secondary-dark hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-primary'
+                  }`}
+              >
+                <span className="material-symbols-outlined">chevron_right</span>
+              </button>
             </div>
-
-            <button
-              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-              disabled={currentPage === totalPages}
-              className={`p-2 rounded-xl transition-colors ${currentPage === totalPages
-                ? 'text-slate-300 dark:text-slate-700 cursor-not-allowed'
-                : 'text-text-secondary-light dark:text-text-secondary-dark hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-primary'
-                }`}
-            >
-              <span className="material-symbols-outlined">chevron_right</span>
-            </button>
-          </div>
-        )}
+          )
+        }
 
         <footer className="mt-8 mb-8 flex flex-col items-center justify-center text-text-secondary-light dark:text-text-secondary-dark text-sm font-medium gap-2">
           <div className="h-px w-12 bg-slate-300 dark:bg-slate-700"></div>
