@@ -135,11 +135,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobileMenuOpen, setIsMobileMenuOpen
             <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/80 hover:bg-white transition-all hover:scale-[1.02] border border-slate-200 shadow-sm group relative z-10">
               <div
                 className="bg-center bg-no-repeat bg-cover rounded-full size-10 ring-2 ring-slate-100 shadow-sm group-hover:ring-primary/50 transition-all"
-                style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDaJgw7RZUqVODu7alZtmmjrC5Q_VpUuwqO7XSEGk2gnFL84TExeG1RjPLQx8X1pSsju_lcY7dkAyonIH6Z747SZrCTi4q3EV4QxKp-9_jSJhSjKa_0r0U8VIYszpVZREuiobbF1s0bw9HdRgQrMJLivdzJW_zT4QylNjX_MBmDFv7jOOcFrydPumdv_MEz3mqH4eQoPQeiedNnLesbg2IlxqsmyzJd82PEtrnVO24Ab6WBm1RFN4lg3kcwxBQo8URrL5bsPGvw7lQ")' }}
+                style={{ backgroundImage: `url("${localStorage.getItem('avatarType') === 'girl' ? '/assets/girl_avatar.png' : '/assets/boy_avatar.png'}")` }}
               ></div>
               <div className="flex flex-col overflow-hidden">
-                <p className="text-text-main-light text-sm font-bold leading-none truncate group-hover:text-primary transition-colors">Nani</p>
-                <p className="text-text-secondary-light text-xs mt-1 truncate">Premium Plan</p>
+                <p className="text-text-main-light text-sm font-bold leading-none truncate group-hover:text-primary transition-colors">{localStorage.getItem('username') || 'User'}</p>
+                <p className="text-text-secondary-light text-xs mt-1 truncate">{localStorage.getItem('userEmail') || 'nani@validityvision.com'}</p>
               </div>
               <button
                 onClick={(e) => {

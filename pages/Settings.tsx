@@ -4,8 +4,8 @@ import { useNavigate } from 'react-router-dom';
 const Settings: React.FC = () => {
     const navigate = useNavigate();
     // State for profile
-    const [displayName, setDisplayName] = useState("Nani");
-    const [bio, setBio] = useState("Food enthusiast & sustainability advocate.");
+    const [displayName, setDisplayName] = useState(localStorage.getItem('username') || "User");
+    const [avatarType, setAvatarType] = useState<'boy' | 'girl'>(localStorage.getItem('avatarType') as 'boy' | 'girl' || 'boy');
 
     // State for preferences
     const [preferences, setPreferences] = useState({
@@ -47,8 +47,22 @@ const Settings: React.FC = () => {
             }
         }
 
+        // Save profile changes
+        localStorage.setItem('username', displayName);
+        localStorage.setItem('avatarType', avatarType);
+
         // Simulate API call
-        console.log("Saving settings:", { displayName, bio, preferences, passwordUpdated: !!passwords.new });
+        console.log("Saving settings:", { displayName, avatarType, preferences, passwordUpdated: !!passwords.new });
+
+        // Check and send notifications if enabled (Simulated)
+        if (preferences.pushNotifications) {
+            const userEmail = localStorage.getItem('userEmail');
+            if (userEmail) {
+                // This logic was in previous version, keeping it simple for restoration
+                console.log(`Checking expiry notifications for ${userEmail}`);
+            }
+        }
+
         alert("Settings saved successfully!");
         setPasswords({ new: "", confirm: "" });
     };
@@ -66,6 +80,8 @@ const Settings: React.FC = () => {
             navigate('/');
         }
     };
+
+    const avatarUrl = avatarType === 'boy' ? '/assets/boy_avatar.png' : '/assets/girl_avatar.png';
 
     return (
         <div className="flex-1 flex flex-col h-full relative overflow-hidden bg-background-light dark:bg-background-dark transition-colors duration-500 z-10">
@@ -93,23 +109,45 @@ const Settings: React.FC = () => {
                 </div>
             </header>
 
-            <div className="flex-1 overflow-y-auto px-4 md:px-10 pb-10 custom-scrollbar z-10 relative">
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 max-w-7xl mx-auto">
-                    <div className="lg:col-span-4 flex flex-col gap-8">
+            <style>{`
+                .scrollbar-hide::-webkit-scrollbar {
+                    display: none;
+                }
+                .scrollbar-hide {
+                    -ms-overflow-style: none;
+                    scrollbar-width: none;
+                }
+            `}</style>
+            <div className="flex-1 overflow-y-auto px-4 md:px-10 pb-10 scrollbar-hide z-10 relative">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-7xl mx-auto">
+                    <div className="flex flex-col gap-8">
                         <div className="bg-surface-card-light dark:bg-surface-card-dark rounded-3xl p-8 border border-slate-200 dark:border-slate-800 shadow-card relative overflow-hidden animate-fade-in group hover:shadow-hover transition-all duration-500" style={{ animationDelay: '100ms' }}>
                             <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent opacity-50"></div>
                             <div className="relative z-10 flex flex-col items-center text-center">
                                 <div className="relative mb-6 group-hover:scale-105 transition-transform duration-500">
                                     <div className="absolute inset-0 bg-gradient-to-tr from-primary to-accent-orange rounded-full blur-md opacity-40 animate-pulse"></div>
-                                    <div className="w-32 h-32 rounded-full border-4 border-white dark:border-slate-800 shadow-xl overflow-hidden relative z-10">
-                                        <img alt="Profile" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDaJgw7RZUqVODu7alZtmmjrC5Q_VpUuwqO7XSEGk2gnFL84TExeG1RjPLQx8X1pSsju_lcY7dkAyonIH6Z747SZrCTi4q3EV4QxKp-9_jSJhSjKa_0r0U8VIYszpVZREuiobbF1s0bw9HdRgQrMJLivdzJW_zT4QylNjX_MBmDFv7jOOcFrydPumdv_MEz3mqH4eQoPQeiedNnLesbg2IlxqsmyzJd82PEtrnVO24Ab6WBm1RFN4lg3kcwxBQo8URrL5bsPGvw7lQ" />
+                                    <div className="w-32 h-32 rounded-full border-4 border-white dark:border-slate-800 shadow-xl overflow-hidden relative z-10 bg-slate-100 dark:bg-slate-700">
+                                        <img alt="Profile" className="w-full h-full object-cover" src={avatarUrl} />
                                     </div>
-                                    <button className="absolute bottom-1 right-1 bg-primary text-white p-2.5 rounded-full shadow-lg border-4 border-white dark:border-slate-800 hover:scale-110 hover:bg-primary-dark transition-all z-20 group/btn">
-                                        <span className="material-symbols-outlined text-[18px] group-hover/btn:rotate-90 transition-transform duration-300">edit</span>
-                                    </button>
+                                    <div className="absolute -bottom-4 -right-4 flex gap-2 z-20 scale-90">
+                                        <button
+                                            onClick={() => setAvatarType('boy')}
+                                            className={`w-12 h-12 rounded-full border-2 border-white dark:border-slate-800 shadow-lg overflow-hidden transition-all bg-white dark:bg-slate-800 ${avatarType === 'boy' ? 'ring-2 ring-primary scale-110' : 'opacity-80 hover:opacity-100 hover:scale-105'}`}
+                                            title="Select Boy Avatar"
+                                        >
+                                            <img src="/assets/boy_avatar.png" alt="Boy" className="w-full h-full object-cover" />
+                                        </button>
+                                        <button
+                                            onClick={() => setAvatarType('girl')}
+                                            className={`w-12 h-12 rounded-full border-2 border-white dark:border-slate-800 shadow-lg overflow-hidden transition-all bg-white dark:bg-slate-800 ${avatarType === 'girl' ? 'ring-2 ring-pink-500 scale-110' : 'opacity-80 hover:opacity-100 hover:scale-105'}`}
+                                            title="Select Girl Avatar"
+                                        >
+                                            <img src="/assets/girl_avatar.png" alt="Girl" className="w-full h-full object-cover" />
+                                        </button>
+                                    </div>
                                 </div>
                                 <h3 className="text-xl font-bold text-text-main-light dark:text-text-main-dark mb-1">{displayName || 'User'}</h3>
-                                <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark mb-6">nani@validityvision.com</p>
+                                <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark mb-6">{localStorage.getItem('userEmail') || 'nani@validityvision.com'}</p>
                                 <div className="w-full space-y-4">
                                     <div className="input-group group text-left">
                                         <label className="block text-xs font-bold text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wide mb-2 transition-colors">Display Name</label>
@@ -128,55 +166,34 @@ const Settings: React.FC = () => {
                                             />
                                         </div>
                                     </div>
-                                    <div className="input-group group text-left">
-                                        <label className="block text-xs font-bold text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wide mb-2 transition-colors">Bio</label>
-                                        <div className="relative">
-                                            <div className="absolute top-3 left-0 pl-3 flex items-start pointer-events-none">
-                                                <div className="icon-box p-1.5 rounded-lg text-slate-400 transition-colors duration-300">
-                                                    <span className="material-symbols-outlined text-[20px]">description</span>
-                                                </div>
-                                            </div>
-                                            <textarea
-                                                className="block w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-300 shadow-inner-glow dark:text-white resize-none"
-                                                placeholder="A brief description..."
-                                                rows={3}
-                                                value={bio}
-                                                onChange={(e) => setBio(e.target.value)}
-                                            ></textarea>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="bg-gradient-to-br from-slate-900 to-slate-800 dark:from-indigo-900 dark:to-slate-900 rounded-3xl p-8 shadow-xl relative overflow-hidden animate-fade-in group hover:-translate-y-1 transition-transform duration-500" style={{ animationDelay: '200ms' }}>
-                            <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:bg-white/10 transition-colors"></div>
-                            <div className="absolute bottom-0 left-0 w-32 h-32 bg-primary/20 rounded-full blur-2xl translate-y-1/3 -translate-x-1/3"></div>
-                            <div className="relative z-10 text-white">
-                                <div className="flex justify-between items-start mb-6">
-                                    <div className="p-3 bg-white/10 backdrop-blur-md rounded-2xl border border-white/10">
-                                        <span className="material-symbols-outlined text-2xl text-accent-yellow">diamond</span>
+                        <div className="bg-red-50/50 dark:bg-red-900/10 rounded-3xl p-8 border border-red-100 dark:border-red-900/30 shadow-sm animate-fade-in group hover:border-red-200 transition-colors" style={{ animationDelay: '500ms' }}>
+                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                                <div className="flex items-start gap-4">
+                                    <div className="p-3 bg-red-100 dark:bg-red-900/20 text-danger rounded-2xl group-hover:scale-110 transition-transform duration-300">
+                                        <span className="material-symbols-outlined text-2xl">warning</span>
                                     </div>
-                                    <span className="px-3 py-1 bg-gradient-to-r from-accent-yellow to-orange-500 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-lg">Premium</span>
-                                </div>
-                                <h4 className="text-2xl font-bold mb-2">Pro Plan Active</h4>
-                                <p className="text-slate-400 text-sm mb-6">Your subscription renews on <span className="text-white font-medium">Nov 24, 2023</span>.</p>
-                                <div className="space-y-3 mb-6">
-                                    <div className="flex items-center gap-3 text-sm text-slate-300">
-                                        <span className="material-symbols-outlined text-primary text-lg">check_circle</span>
-                                        Unlimited Product Scans
-                                    </div>
-                                    <div className="flex items-center gap-3 text-sm text-slate-300">
-                                        <span className="material-symbols-outlined text-primary text-lg">check_circle</span>
-                                        Advanced Analytics
+                                    <div>
+                                        <h3 className="text-lg font-bold text-text-main-light dark:text-text-main-dark">Danger Zone</h3>
+                                        <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark max-w-md">Once you delete your account, there is no going back. Please be certain.</p>
                                     </div>
                                 </div>
-                                <button className="w-full py-3 rounded-xl bg-white text-slate-900 text-sm font-bold hover:bg-slate-50 transition-colors shadow-lg active:scale-95">Manage Subscription</button>
+                                <button
+                                    onClick={handleDeleteAccount}
+                                    className="px-6 py-3 rounded-xl bg-white dark:bg-slate-800 text-danger border border-red-200 dark:border-red-900/50 hover:bg-red-500 hover:text-white transition-all text-sm font-bold shadow-sm hover:shadow-lg hover:shadow-red-500/30 whitespace-nowrap active:scale-95"
+                                >
+                                    Delete Account
+                                </button>
                             </div>
                         </div>
+
+
                     </div>
 
-                    <div className="lg:col-span-8 flex flex-col gap-8">
+                    <div className="flex flex-col gap-8">
                         <div className="bg-surface-card-light dark:bg-surface-card-dark rounded-3xl p-8 border border-slate-200 dark:border-slate-800 shadow-card animate-fade-in relative overflow-hidden" style={{ animationDelay: '300ms' }}>
                             <div className="flex items-center gap-4 mb-8">
                                 <div className="p-3 bg-primary/10 dark:bg-primary/20 text-primary rounded-2xl">
@@ -260,7 +277,7 @@ const Settings: React.FC = () => {
                                     <span className="material-symbols-outlined text-2xl">lock</span>
                                 </div>
                                 <div>
-                                    <h3 className="text-lg font-bold text-text-main-light dark:text-text-main-dark">Security & Login</h3>
+                                    <h3 className="text-lg font-bold text-text-main-light dark:text-text-main-dark">Change Password</h3>
                                     <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">Protect your account</p>
                                 </div>
                             </div>
@@ -276,7 +293,7 @@ const Settings: React.FC = () => {
                                         </div>
                                         <input
                                             className="block w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-300 shadow-inner-glow dark:text-white"
-                                            placeholder="••••••••"
+                                            placeholder="Min 8 chars"
                                             type="password"
                                             value={passwords.new}
                                             onChange={(e) => handlePasswordChange('new', e.target.value)}
@@ -288,38 +305,18 @@ const Settings: React.FC = () => {
                                     <div className="relative">
                                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                             <div className="icon-box p-1.5 rounded-lg text-slate-400 transition-colors duration-300">
-                                                <span className="material-symbols-outlined text-[20px]">check</span>
+                                                <span className="material-symbols-outlined text-[20px]">check_circle</span>
                                             </div>
                                         </div>
                                         <input
                                             className="block w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-300 shadow-inner-glow dark:text-white"
-                                            placeholder="••••••••"
+                                            placeholder="Repeat password"
                                             type="password"
                                             value={passwords.confirm}
                                             onChange={(e) => handlePasswordChange('confirm', e.target.value)}
                                         />
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-
-                        <div className="bg-red-50/50 dark:bg-red-900/10 rounded-3xl p-8 border border-red-100 dark:border-red-900/30 shadow-sm animate-fade-in group hover:border-red-200 transition-colors" style={{ animationDelay: '500ms' }}>
-                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                                <div className="flex items-start gap-4">
-                                    <div className="p-3 bg-red-100 dark:bg-red-900/20 text-danger rounded-2xl group-hover:scale-110 transition-transform duration-300">
-                                        <span className="material-symbols-outlined text-2xl">warning</span>
-                                    </div>
-                                    <div>
-                                        <h3 className="text-lg font-bold text-text-main-light dark:text-text-main-dark">Danger Zone</h3>
-                                        <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark max-w-md">Once you delete your account, there is no going back. Please be certain.</p>
-                                    </div>
-                                </div>
-                                <button
-                                    onClick={handleDeleteAccount}
-                                    className="px-6 py-3 rounded-xl bg-white dark:bg-slate-800 text-danger border border-red-200 dark:border-red-900/50 hover:bg-red-500 hover:text-white transition-all text-sm font-bold shadow-sm hover:shadow-lg hover:shadow-red-500/30 whitespace-nowrap active:scale-95"
-                                >
-                                    Delete Account
-                                </button>
                             </div>
                         </div>
                     </div>
