@@ -179,7 +179,7 @@ const ScanResult: React.FC = () => {
                 }
             } catch (error) {
                 console.error("Auto-save failed:", error);
-                alert("Failed to save product. Please check your connection and try again.");
+        
             }
         };
 
@@ -516,14 +516,7 @@ const ScanResult: React.FC = () => {
                                             </span>
                                         ))}
                                     </div>
-                                    <button
-                                        onClick={handleDelete}
-                                        disabled={!scanId} // Disable until auto-save completes
-                                        className="flex-1 md:flex-none md:min-w-[200px] h-12 text-white text-sm font-bold rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 bg-red-500 hover:bg-red-600 shadow-red-500/30 disabled:bg-slate-400 disabled:cursor-not-allowed"
-                                    >
-                                        <span className="material-symbols-outlined">{!scanId ? 'sync' : 'delete'}</span>
-                                        {!scanId ? 'Saving...' : 'Remove from Pantry'}
-                                    </button>
+                                   
                                 </div>
                             </div>
 
