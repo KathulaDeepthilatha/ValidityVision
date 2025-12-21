@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE_URL } from '../utils/apiConfig';
 
 const Onboarding: React.FC = () => {
   const navigate = useNavigate();
@@ -35,7 +36,7 @@ const Onboarding: React.FC = () => {
         console.log('🚀 Sending Register Request to backend...');
         console.log('Payload:', JSON.stringify(formData, null, 2));
 
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/register`, {
+        const response = await fetch(`${API_BASE_URL}/auth/register`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(formData)

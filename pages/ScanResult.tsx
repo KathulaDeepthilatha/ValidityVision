@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { API_BASE_URL } from '../utils/apiConfig';
 
 interface ScanData {
     name: string;
@@ -69,7 +70,7 @@ const ScanResult: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [isEditing, setIsEditing] = useState(false);
     const [editedData, setEditedData] = useState<ScanData | null>(null);
-    const [scanId, setScanId] = useState<number | null>(null);
+    const [scanId, setScanId] = useState<string | null>(null);
     const [isAdded, setIsAdded] = useState(false);
 
     const calculateExpiryDate = (manufacturedDate: string, bestBefore: string): string => {
@@ -118,6 +119,11 @@ const ScanResult: React.FC = () => {
                     data.dates.daysLeft = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
                 }
 
+                if ((data as any)._id) {
+                    setScanId((data as any)._id);
+                    setIsAdded(true);
+                }
+
                 setScanData(data);
             } catch (error) {
                 console.error('Error processing scan result:', error);
@@ -129,6 +135,59 @@ const ScanResult: React.FC = () => {
         processScanResult();
     }, [apiScanData, frontImage, backImage]);
 
+    // Auto-save effect for new scans
+    useEffect(() => {
+        const autoSaveToPantry = async () => {
+            if (!scanData || scanId || isAdded) return;
+
+            try {
+                const userEmail = localStorage.getItem('userEmail');
+                if (!userEmail) return;
+
+                console.log("Auto-saving new scan to pantry...");
+                setIsAdded(true); // Optimistic
+
+                const thumbFront = await createThumbnail(frontImage || scanData.image);
+
+                const payload = {
+                    email: userEmail,
+                    name: scanData.name,
+                    category: scanData.category,
+                    image: thumbFront,
+                    status: scanData.status,
+                    score: scanData.score,
+                    dates: scanData.dates,
+                    tags: scanData.tags,
+                    ingredients: scanData.ingredients,
+                    analysis: scanData.analysis
+                };
+
+                const response = await fetch(`${API_BASE_URL}/api/product`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+
+                if (result.success && result.data && result.data._id) {
+                    console.log("Auto-save successful, assigned ID:", result.data._id);
+                    setScanId(result.data._id);
+                } else if (result.success) {
+                    // Fallback if ID not in standard location, though it should be
+                    console.warn("Saved but ID missing in response");
+                }
+            } catch (error) {
+                console.error("Auto-save failed:", error);
+                alert("Failed to save product. Please check your connection and try again.");
+            }
+        };
+
+        if (scanData && !scanId && !isAdded) {
+            autoSaveToPantry();
+        }
+    }, [scanData, scanId, isAdded, frontImage]);
+
     const handleEditClick = () => {
         setEditedData(JSON.parse(JSON.stringify(scanData))); // Deep copy
         setIsEditing(true);
@@ -139,59 +198,62 @@ const ScanResult: React.FC = () => {
         setIsEditing(false);
     };
 
-    const handleSaveEdit = () => {
+    const handleSaveEdit = async () => {
         if (!editedData) return;
 
-        // Update the current scan data
-        setScanData(editedData);
-        setIsEditing(false);
-    };
+        // If this is an existing item, update via API
+        // If this is an existing item
+        if (scanId) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/product/id/${scanId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(editedData)
+                });
 
-
-    const handleAddToPantry = async () => {
-        if (!scanData || isAdded) return;
-
-        setIsAdded(true); // Prevent multiple clicks immediately
-
-        try {
-            // Compress images before saving to avoid LocalStorage limits
-            // The original images are likely huge PNGs from canvas
-            // Use frontImage (captured) if available, otherwise fallback to API image
-            const thumbFront = await createThumbnail(frontImage || scanData.image);
-            const thumbBack = await createThumbnail(backImage || "");
-
-            const existingScans = JSON.parse(localStorage.getItem('scanHistory') || '[]');
-            const newScan = {
-                id: Date.now(),
-                timestamp: new Date().toISOString(),
-                frontImage: thumbFront,
-                backImage: thumbBack,
-                data: scanData
-            };
-
-            // Add to beginning of array
-            existingScans.unshift(newScan);
-
-            // Allow up to 20 items, remove oldest if needed to save space
-            if (existingScans.length > 20) {
-                existingScans.length = 20;
+                if (response.ok) {
+                    setScanData(editedData);
+                    setIsEditing(false);
+                    alert("Product updated successfully!");
+                } else {
+                    throw new Error("Failed to update product");
+                }
+            } catch (error) {
+                console.error("Update error:", error);
+                alert("Failed to update product. Please check your connection and try again.");
             }
-
-            localStorage.setItem('scanHistory', JSON.stringify(existingScans));
-
-            alert("Product added successfully!");
-            navigate('/inventory');
-        } catch (e) {
-            console.error("Storage error:", e);
-            setIsAdded(false); // Re-enable if failed
-            if (e instanceof DOMException &&
-                (e.code === 22 || e.code === 1014 || e.name === 'QuotaExceededError' || e.name === 'NS_ERROR_DOM_QUOTA_REACHED')) {
-                alert("Storage full! Please delete older items from inventory to make space.");
-            } else {
-                alert("Failed to save product. Please try again.");
-            }
+        } else {
+            // Just update local state for new items
+            setScanData(editedData);
+            setIsEditing(false);
         }
     };
+
+    const handleDelete = async () => {
+        if (!scanId) return;
+
+        if (!window.confirm("Are you sure you want to remove this item from your pantry?")) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/product/id/${scanId}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                alert("Product removed successfully!");
+                navigate('/inventory');
+            } else {
+                const data = await response.json();
+                throw new Error(data.message || "Failed to delete product");
+            }
+        } catch (error) {
+            console.error("Delete error:", error);
+            alert("Failed to delete product. Please check your connection and try again.");
+        }
+    };
+
 
     const handleFieldChange = (field: string, value: any) => {
         if (!editedData) return;
@@ -455,12 +517,12 @@ const ScanResult: React.FC = () => {
                                         ))}
                                     </div>
                                     <button
-                                        onClick={handleAddToPantry}
-                                        disabled={isAdded}
-                                        className={`flex-1 md:flex-none md:min-w-[200px] h-12 text-white text-sm font-bold rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 ${isAdded ? 'bg-slate-400 cursor-not-allowed' : 'bg-gradient-to-r from-primary to-primary-dark hover:to-primary'}`}
+                                        onClick={handleDelete}
+                                        disabled={!scanId} // Disable until auto-save completes
+                                        className="flex-1 md:flex-none md:min-w-[200px] h-12 text-white text-sm font-bold rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 bg-red-500 hover:bg-red-600 shadow-red-500/30 disabled:bg-slate-400 disabled:cursor-not-allowed"
                                     >
-                                        <span className="material-symbols-outlined">{isAdded ? 'check' : 'inventory_2'}</span>
-                                        {isAdded ? 'Added to Pantry' : 'Add to Pantry'}
+                                        <span className="material-symbols-outlined">{!scanId ? 'sync' : 'delete'}</span>
+                                        {!scanId ? 'Saving...' : 'Remove from Pantry'}
                                     </button>
                                 </div>
                             </div>

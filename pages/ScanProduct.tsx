@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import imageCompression from 'browser-image-compression';
+import { API_BASE_URL } from '../utils/apiConfig';
 
 // Helper: Convert Base64 to File
 const dataURLtoFile = (dataurl: string, filename: string): File => {
@@ -41,14 +42,35 @@ const ScanProduct: React.FC = () => {
     const [recentScans, setRecentScans] = useState<any[]>([]);
 
     useEffect(() => {
-        try {
-            const history = JSON.parse(localStorage.getItem('scanHistory') || '[]');
-            // Sort by date if available, or just reverse to show newest first
-            // assuming push() was used, so last is newest. Reverse it.
-            setRecentScans(history.reverse().slice(0, 3));
-        } catch (e) {
-            console.error("Failed to load recent scans", e);
-        }
+        const loadRecentScans = async () => {
+            try {
+                const userEmail = localStorage.getItem('userEmail');
+                if (!userEmail) {
+                    setRecentScans([]);
+                    return;
+                }
+
+                const response = await fetch(`${API_BASE_URL}/api/product/${userEmail}`);
+                const data = await response.json();
+
+                if (data.success && Array.isArray(data.data)) {
+                    // Get the 3 most recent items
+                    const recent = data.data.slice(0, 3).map((product: any) => ({
+                        frontImage: product.image,
+                        backImage: null,
+                        data: product
+                    }));
+                    setRecentScans(recent);
+                } else {
+                    setRecentScans([]);
+                }
+            } catch (e) {
+                console.error("Failed to load recent scans", e);
+                setRecentScans([]);
+            }
+        };
+
+        loadRecentScans();
     }, []);
 
     const videoRef = useRef<HTMLVideoElement>(null);

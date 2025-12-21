@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE_URL } from '../utils/apiConfig';
 
 interface InventoryItem {
   id: string;
@@ -34,7 +35,7 @@ const Inventory: React.FC = () => {
           return;
         }
 
-        const response = await fetch(`http://localhost:8080/api/products/${userEmail}`);
+        const response = await fetch(`${API_BASE_URL}/api/products/${userEmail}`);
         const data = await response.json();
 
         if (data.success && Array.isArray(data.data)) {
@@ -70,12 +71,12 @@ const Inventory: React.FC = () => {
           setInventoryItems(items);
         } else {
           console.error("Failed to fetch products or invalid data format");
-          setInventoryItems([]);
+          throw new Error("Invalid API response");
         }
       } catch (error) {
-        console.error('Error loading inventory from API:', error);
-        // Fallback to empty or localStorage if desired, but user asked to use API
+        console.error('Failed to load inventory:', error);
         setInventoryItems([]);
+        // Optionally, you could add a toast notification here
       }
     };
 
@@ -115,7 +116,7 @@ const Inventory: React.FC = () => {
 
       <header className="w-full px-4 md:px-8 py-6 md:py-8 flex flex-col md:flex-row gap-4 md:gap-0 justify-between items-start md:items-center shrink-0 z-10 relative">
         <div className="w-full md:w-auto pr-12 md:pr-0">
-          <h2 className="text-text-main-light dark:text-text-main-dark text-3xl font-black leading-tight tracking-[-0.033em]">Inventory</h2>
+          <h2 className="text-text-main-light dark:text-text-main-dark text-3xl font-black leading-tight tracking-[-0.033em]">Pantry</h2>
         </div>
         <div className="flex items-center gap-3 w-full md:w-auto">
           <div className="flex-1 md:flex-none flex items-center gap-2 bg-white dark:bg-surface-card-dark p-1.5 rounded-full border border-slate-200 dark:border-slate-700 shadow-sm w-full md:w-auto">
