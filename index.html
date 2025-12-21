@@ -21,7 +21,6 @@
   <script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
   <script>
     tailwind.config = {
-      // darkMode: "class", // DISABLED: Light mode only
       theme: {
         extend: {
           colors: {
@@ -36,24 +35,20 @@
             },
             background: {
               light: "#f8fafc",
-              dark: "#0f172a",
             },
             surface: {
               light: "#ffffff",
               dark: "#1e293b",
               card: {
                 light: "#ffffff",
-                dark: "#1e293b"
               }
             },
             text: {
               main: {
                 light: "#0f172a",
-                dark: "#f1f5f9",
               },
               secondary: {
                 light: "#64748b",
-                dark: "#94a3b8",
               }
             },
             accent: {
@@ -122,12 +117,6 @@
       border-radius: 4px;
     }
 
-    /* DISABLED: Dark mode scrollbar
-      .dark ::-webkit-scrollbar-thumb {
-        background: #475569;
-      }
-      */
-
     /* Utilities */
     .glass-panel {
       background: rgba(255, 255, 255, 0.7);
@@ -135,13 +124,6 @@
       -webkit-backdrop-filter: blur(12px);
       border: 1px solid rgba(255, 255, 255, 0.5);
     }
-
-    /* DISABLED: Dark mode glass panel
-      .dark .glass-panel {
-        background: rgba(30, 41, 59, 0.7);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-      }
-      */
 
     .scanner-overlay {
       background:
@@ -172,7 +154,6 @@
 
 <body
   class="bg-background-light text-text-main-light transition-colors duration-300 antialiased selection:bg-primary selection:text-white">
-  <!-- LIGHT MODE ONLY: Removed dark:bg-background-dark and dark:text-text-main-dark classes -->
   <div id="root"></div>
   <script type="module" src="/index.tsx"></script>
 </body>
