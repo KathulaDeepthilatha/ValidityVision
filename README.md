@@ -5,7 +5,7 @@
   **Smart AI Expiry tracking and safety consultant**
   
   <p>
-    Scan products, track expiration dates, and analyze ingredients instantly.
+    Scan product, track expiration dates, and analyze ingredients instantly.
     <br />
     <em>"Know Your Pantry, Trust Your Safety."</em>
   </p>

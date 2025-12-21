@@ -35,7 +35,7 @@ const Inventory: React.FC = () => {
           return;
         }
 
-        const response = await fetch(`${API_BASE_URL}/api/products/${userEmail}`);
+        const response = await fetch(`${API_BASE_URL}/api/product/${userEmail}`);
         const data = await response.json();
 
         if (data.success && Array.isArray(data.data)) {
@@ -70,7 +70,7 @@ const Inventory: React.FC = () => {
           });
           setInventoryItems(items);
         } else {
-          console.error("Failed to fetch products or invalid data format");
+          console.error("Failed to fetch product or invalid data format");
           throw new Error("Invalid API response");
         }
       } catch (error) {

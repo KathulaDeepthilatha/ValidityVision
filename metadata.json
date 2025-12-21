@@ -1,6 +1,6 @@
 {
   "name": "ValidityVision",
-  "description": "Smart pantry management assistant powered by AI. Scan products, track expiration dates, and analyze ingredients.",
+  "description": "Smart pantry management assistant powered by AI. Scan product, track expiration dates, and analyze ingredients.",
   "requestFramePermissions": [
     "camera"
   ]
