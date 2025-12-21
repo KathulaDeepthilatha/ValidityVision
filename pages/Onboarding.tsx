@@ -36,20 +36,88 @@ const Onboarding: React.FC = () => {
         console.log('🚀 Sending Register Request to backend...');
         console.log('Payload:', JSON.stringify(formData, null, 2));
 
-        const response = await fetch(`${API_BASE_URL}/auth/register`, {
+        const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(formData)
         });
 
-        console.log('✅ Response status:', response.status);
+        console.log('✅ Register Response status:', response.status);
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log('✅ Registration successful:', data);
+
+          // Store user data if provided by backend
+          if (data.user) {
+            if (data.user.username) {
+              localStorage.setItem('username', data.user.username);
+            }
+            if (data.user.email) {
+              localStorage.setItem('userEmail', data.user.email);
+            }
+          }
+        } else {
+          const errorData = await response.json();
+          console.error('❌ Registration failed:', errorData);
+          alert(errorData.message || 'Registration failed. Please try again.');
+          setIsLoading(false);
+          return;
+        }
       } catch (e) {
-        console.warn("⚠️ Backend request failed (this is expected if no server is running on port 3000).");
+        console.warn("⚠️ Backend registration request failed");
         console.warn("Error details:", e);
+        alert('Unable to connect to server. Please try again later.');
+        setIsLoading(false);
+        return;
       }
     } else {
       // Login Logic
-      console.log('🚀 Login initiated...');
+      try {
+        console.log('🚀 Sending Login Request to backend...');
+        console.log('Payload:', JSON.stringify({
+          email: formData.email,
+          password: formData.password
+        }, null, 2));
+
+        const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: formData.email,
+            password: formData.password
+          })
+        });
+
+        console.log('✅ Login Response status:', response.status);
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log('✅ Login successful:', data);
+
+          // Store user data if provided by backend
+          if (data.user) {
+            if (data.user.username) {
+              localStorage.setItem('username', data.user.username);
+            }
+            if (data.user.email) {
+              localStorage.setItem('userEmail', data.user.email);
+            }
+          }
+        } else {
+          const errorData = await response.json();
+          console.error('❌ Login failed:', errorData);
+          alert(errorData.message || 'Login failed. Please check your credentials.');
+          setIsLoading(false);
+          return;
+        }
+      } catch (e) {
+        console.warn("⚠️ Backend login request failed");
+        console.warn("Error details:", e);
+        alert('Unable to connect to server. Please try again later.');
+        setIsLoading(false);
+        return;
+      }
     }
 
     // Save user credentials for API requests
