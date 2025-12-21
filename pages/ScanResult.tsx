@@ -533,10 +533,6 @@ const ScanResult: React.FC = () => {
                                         <span className="material-symbols-outlined text-accent-purple">science</span>
                                         Ingredient Analysis
                                     </h3>
-                                    <button className="text-xs text-primary font-medium hover:text-accent-purple transition-colors flex items-center gap-1 group">
-                                        View Full Label
-                                        <span className="material-symbols-outlined text-[14px] group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
-                                    </button>
                                 </div>
                                 <div className="divide-y divide-slate-200">
                                     <div className="p-6 hover:bg-slate-50/50 transition-colors">

@@ -402,10 +402,23 @@ const ScanProduct: React.FC = () => {
                                     </button>
                                     <button
                                         onClick={handleConfirm}
-                                        className="flex items-center justify-center gap-2 py-4 px-8 rounded-full bg-primary text-white shadow-lg hover:shadow-xl hover:bg-primary-dark transition-all font-bold w-full sm:w-auto min-w-[150px]"
+                                        disabled={isProcessing}
+                                        className={`flex items-center justify-center gap-2 py-4 px-8 rounded-full shadow-lg hover:shadow-xl transition-all font-bold w-full sm:w-auto min-w-[150px] ${isProcessing
+                                            ? 'bg-slate-400 cursor-not-allowed'
+                                            : 'bg-primary hover:bg-primary-dark text-white'
+                                            }`}
                                     >
-                                        <span className="material-symbols-outlined">check</span>
-                                        {isProcessing ? 'Processing...' : 'Confirm'}
+                                        {isProcessing ? (
+                                            <>
+                                                <span className="material-symbols-outlined animate-spin">sync</span>
+                                                Processing...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <span className="material-symbols-outlined">check</span>
+                                                Confirm
+                                            </>
+                                        )}
                                     </button>
                                 </>
                             ) : (
@@ -531,6 +544,33 @@ const ScanProduct: React.FC = () => {
                                 >
                                     Confirm
                                 </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Processing Overlay */}
+            {isProcessing && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md animate-fade-in">
+                    <div className="bg-white dark:bg-surface-card-dark rounded-3xl p-8 shadow-2xl max-w-md w-full mx-4 border border-slate-200 dark:border-slate-700 animate-scale-in">
+                        <div className="flex flex-col items-center text-center gap-6">
+                            <div className="relative">
+                                <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center">
+                                    <span className="material-symbols-outlined text-5xl text-primary animate-spin">sync</span>
+                                </div>
+                                <div className="absolute inset-0 bg-primary/20 rounded-full animate-ping"></div>
+                            </div>
+                            <div>
+                                <h3 className="text-2xl font-bold text-text-main-light dark:text-text-main-dark mb-2">
+                                    Analyzing Product...
+                                </h3>
+                                <p className="text-text-secondary-light dark:text-text-secondary-dark text-sm">
+                                    Our AI is reading the labels and identifying ingredients. This may take a few moments.
+                                </p>
+                            </div>
+                            <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2 overflow-hidden">
+                                <div className="h-full bg-gradient-to-r from-primary to-accent-purple rounded-full animate-pulse" style={{ width: '70%' }}></div>
                             </div>
                         </div>
                     </div>
