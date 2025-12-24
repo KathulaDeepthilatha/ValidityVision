@@ -25,61 +25,68 @@ const Inventory: React.FC = () => {
   const itemsPerPage = 8;
 
   // Load scan history from localStorage
-  useEffect(() => {
-    const loadInventory = async () => {
-      try {
-        const userEmail = localStorage.getItem('userEmail');
-        if (!userEmail) {
-          console.warn("No user email found, skipping API fetch.");
-          setInventoryItems([]);
-          return;
-        }
-
-        const response = await fetch(`${API_BASE_URL}/api/product/${userEmail}`);
-        const data = await response.json();
-
-        if (data.success && Array.isArray(data.data)) {
-          const items: InventoryItem[] = data.data.map((product: any) => {
-            // Calculate days left if not provided directly
-            let daysLeft = product.dates?.daysLeft;
-            if (daysLeft === undefined && product.dates?.expiry) {
-              const expiry = new Date(product.dates.expiry);
-              const today = new Date();
-              const diffTime = expiry.getTime() - today.getTime();
-              daysLeft = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            }
-
-            // Determine status
-            let status: 'fresh' | 'expiring' | 'expired' | 'consumed' = 'fresh';
-            if (daysLeft !== undefined) {
-              if (daysLeft < 0) status = 'expired';
-              else if (daysLeft <= 3) status = 'expiring';
-              else status = 'fresh';
-            }
-
-            return {
-              id: product._id,
-              name: product.name,
-              category: product.category,
-              image: product.image,
-              daysLeft: daysLeft,
-              expiryDate: product.dates?.expiry,
-              status: status,
-              originalData: product
-            };
-          });
-          setInventoryItems(items);
-        } else {
-          console.error("Failed to fetch product or invalid data format");
-          throw new Error("Invalid API response");
-        }
-      } catch (error) {
-        console.error('Failed to load inventory:', error);
+  // Load inventory function - made reusable
+  const loadInventory = async () => {
+    try {
+      const userEmail = localStorage.getItem('userEmail');
+      if (!userEmail) {
+        console.warn("No user email found, skipping API fetch.");
         setInventoryItems([]);
-        // Optionally, you could add a toast notification here
+        return;
       }
-    };
 
+      const response = await fetch(`${API_BASE_URL}/api/product/${userEmail}`);
+      const data = await response.json();
+
+      if (data.success && Array.isArray(data.data)) {
+        const items: InventoryItem[] = data.data.map((product: any) => {
+          // Calculate days left if not provided directly
+          let daysLeft = product.dates?.daysLeft;
+          if (daysLeft === undefined && product.dates?.expiry) {
+            const expiry = new Date(product.dates.expiry);
+            const today = new Date();
+            const diffTime = expiry.getTime() - today.getTime();
+            daysLeft = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          }
+
+          // Ensure days left is never negative - show 0 instead
+          if (daysLeft !== undefined && daysLeft < 0) {
+            daysLeft = 0;
+          }
+
+          // Determine status - check consumed field from API
+          let status: 'fresh' | 'expiring' | 'expired' | 'consumed' = 'fresh';
+          if (product.consumed === true) {
+            status = 'consumed';
+          } else if (daysLeft !== undefined) {
+            if (daysLeft === 0) status = 'expired';
+            else if (daysLeft <= 3) status = 'expiring';
+            else status = 'fresh';
+          }
+
+          return {
+            id: product._id,
+            name: product.name,
+            category: product.category,
+            image: product.image,
+            daysLeft: daysLeft,
+            expiryDate: product.dates?.expiry,
+            status: status,
+            originalData: product
+          };
+        });
+        setInventoryItems(items);
+      } else {
+        console.error("Failed to fetch product or invalid data format");
+        throw new Error("Invalid API response");
+      }
+    } catch (error) {
+      console.error('Failed to load inventory:', error);
+      setInventoryItems([]);
+    }
+  };
+
+  useEffect(() => {
     loadInventory();
   }, []);
 
@@ -88,9 +95,66 @@ const Inventory: React.FC = () => {
     setCurrentPage(1);
   }, [activeTab, searchQuery]);
 
+  // Function to mark item as consumed
+  const handleConsume = async (itemId: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card click event
+
+    // Find the item to get its full data
+    const item = inventoryItems.find(i => i.id === itemId);
+    if (!item || !item.originalData) {
+      alert('Item data not found. Please refresh the page.');
+      return;
+    }
+
+    try {
+      // Prepare the full product data with consumed flag
+      const updatedProduct = {
+        ...item.originalData,
+        consumed: true  // Add consumed boolean field instead of changing status
+      };
+
+      // Update in backend
+      const response = await fetch(`${API_BASE_URL}/api/product/id/${itemId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedProduct)
+      });
+
+      if (response.ok) {
+        // Update local state only - no backend reload needed
+        setInventoryItems(prevItems =>
+          prevItems.map(item =>
+            item.id === itemId ? { ...item, status: 'consumed' as const, originalData: { ...item.originalData, consumed: true } } : item
+          )
+        );
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Failed to update item status:', errorData);
+        alert('Failed to mark item as consumed. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error updating item:', error);
+      alert('Failed to mark item as consumed. Please try again.');
+    }
+  };
+
   // Pagination Logic
   const filteredItems = inventoryItems.filter(item => {
-    const matchesTab = activeTab === 'all' || item.status === activeTab;
+    let matchesTab = false;
+
+    if (activeTab === 'all') {
+      matchesTab = true;
+    } else if (activeTab === 'expiring') {
+      // Safe tab: fresh and expiring items (days left > 0)
+      matchesTab = item.status === 'fresh' || item.status === 'expiring';
+    } else if (activeTab === 'expired') {
+      // Unsafe tab: expired items
+      matchesTab = item.status === 'expired';
+    } else if (activeTab === 'consumed') {
+      // Consumed tab: consumed items
+      matchesTab = item.status === 'consumed';
+    }
+
     const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.category.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesTab && matchesSearch;
@@ -289,7 +353,10 @@ const Inventory: React.FC = () => {
                             style={{ width: `${Math.min((item.daysLeft || 0) * 10, 100)}%` }} // Adjusted scale for fresh items
                           ></div>
                         </div>
-                        <button className="flex-1 w-full py-2.5 rounded-xl bg-primary dark:bg-primary-dark text-white text-sm font-bold hover:bg-primary-dark dark:hover:bg-primary shadow-lg shadow-primary/20 transition-all">
+                        <button
+                          onClick={(e) => handleConsume(item.id, e)}
+                          className="flex-1 w-full py-2.5 rounded-xl bg-primary dark:bg-primary-dark text-white text-sm font-bold hover:bg-primary-dark dark:hover:bg-primary shadow-lg shadow-primary/20 transition-all"
+                        >
                           Consume
                         </button>
                       </>
@@ -298,8 +365,8 @@ const Inventory: React.FC = () => {
                     {item.status === 'expired' && (
                       <>
                         <div className="flex justify-between items-center mb-2">
-                          <span className="text-text-secondary-light dark:text-text-secondary-dark text-xs font-medium">Status</span>
-                          <span className="text-danger text-sm font-bold bg-red-50 dark:bg-red-900/30 px-2 py-0.5 rounded">Expired</span>
+                          <span className="text-text-secondary-light dark:text-text-secondary-dark text-xs font-medium">Days left</span>
+                          <span className="text-danger text-sm font-bold bg-red-50 dark:bg-red-900/30 px-2 py-0.5 rounded">0 days left</span>
                         </div>
                         <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden mb-5">
                           <div className="h-full bg-danger w-full rounded-full"></div>
