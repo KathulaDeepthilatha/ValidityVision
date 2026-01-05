@@ -143,11 +143,14 @@ const Onboarding: React.FC = () => {
           <div className="relative w-8 h-8 flex items-center justify-center">
             <span className="material-icons-round text-primary text-3xl transition-transform group-hover:rotate-12 duration-300">auto_awesome</span>
           </div>
-          <span className="font-bold text-xl tracking-tight text-slate-900 dark:text-white">ValidityVision</span>
+          <span className="font-bold text-xl tracking-tight text-slate-900 dark:text-black">ValidityVision</span>
         </div>
         <div className="flex items-center gap-6">
           <button onClick={() => handleSignIn('login')} className="bg-primary hover:bg-primary-hover text-white font-bold py-2.5 px-6 rounded-full shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all transform hover:-translate-y-0.5">
             Login
+          </button>
+          <button onClick={() => handleSignIn('register')} className="bg-primary hover:bg-primary-hover text-white font-bold py-2.5 px-6 rounded-full shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all transform hover:-translate-y-0.5">
+            Register
           </button>
         </div>
       </nav>
@@ -202,12 +205,12 @@ const Onboarding: React.FC = () => {
             </div>
           </div>
 
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-slate-900 dark:text-white mb-6 leading-tight">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-slate-950 dark:text-black mb-6 leading-tight">
             Welcome to <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-indigo-600 dark:from-indigo-400 dark:to-primary">ValidityVision</span>
           </h2>
 
-          <p className="text-lg text-slate-600 dark:text-slate-300 mb-10 leading-relaxed max-w-lg">
+          <p className="text-lg text-slate-700 dark:text-slate-300 mb-10 leading-relaxed max-w-lg">
             Join thousands of users who are saving money and reducing waste. Sign in to sync your inventory across devices.
           </p>
 
@@ -221,33 +224,33 @@ const Onboarding: React.FC = () => {
 
           {/* Feature Tabs/Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full">
-            <div className="flex flex-row md:flex-col items-center md:items-start gap-4 md:gap-3 p-3 md:p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 hover:border-primary/50 dark:hover:border-primary/50 transition-colors group cursor-default">
-              <div className="w-10 h-10 bg-white dark:bg-slate-700 rounded-lg shadow-sm flex items-center justify-center group-hover:scale-110 transition-transform text-primary shrink-0">
+            <div className="flex flex-row md:flex-col items-center md:items-start gap-4 md:gap-3 p-3 md:p-4 rounded-2xl bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 hover:border-primary/50 dark:hover:border-primary/50 transition-colors group cursor-default shadow-sm">
+              <div className="w-10 h-10 bg-primary/10 dark:bg-slate-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform text-primary shrink-0">
                 <span className="material-icons-round text-xl">verified_user</span>
               </div>
               <div>
-                <h3 className="font-bold text-slate-900 dark:text-white mb-1">Safety First</h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400">Instant ingredient analysis</p>
+                <h3 className="font-bold text-slate-950 dark:text-white mb-1">Safety First</h3>
+                <p className="text-xs text-slate-700 dark:text-slate-600">Instant ingredient analysis</p>
               </div>
             </div>
 
-            <div className="flex flex-row md:flex-col items-center md:items-start gap-4 md:gap-3 p-3 md:p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 hover:border-accent-orange/50 dark:hover:border-accent-orange/50 transition-colors group cursor-default">
-              <div className="w-10 h-10 bg-white dark:bg-slate-700 rounded-lg shadow-sm flex items-center justify-center group-hover:scale-110 transition-transform text-accent-orange shrink-0">
+            <div className="flex flex-row md:flex-col items-center md:items-start gap-4 md:gap-3 p-3 md:p-4 rounded-2xl bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 hover:border-accent-orange/50 dark:hover:border-accent-orange/50 transition-colors group cursor-default shadow-sm">
+              <div className="w-10 h-10 bg-orange-50 dark:bg-slate-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform text-accent-orange shrink-0">
                 <span className="material-icons-round text-xl">timer</span>
               </div>
               <div>
-                <h3 className="font-bold text-slate-900 dark:text-white mb-1">Expiry Tracker</h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400">Smart notifications</p>
+                <h3 className="font-bold text-slate-950 dark:text-white mb-1">Expiry Tracker</h3>
+                <p className="text-xs text-slate-700 dark:text-slate-600">Smart notifications</p>
               </div>
             </div>
 
-            <div className="flex flex-row md:flex-col items-center md:items-start gap-4 md:gap-3 p-3 md:p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 hover:border-green-500/50 dark:hover:border-green-500/50 transition-colors group cursor-default">
-              <div className="w-10 h-10 bg-white dark:bg-slate-700 rounded-lg shadow-sm flex items-center justify-center group-hover:scale-110 transition-transform text-green-500 shrink-0">
+            <div className="flex flex-row md:flex-col items-center md:items-start gap-4 md:gap-3 p-3 md:p-4 rounded-2xl bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 hover:border-green-500/50 dark:hover:border-green-500/50 transition-colors group cursor-default shadow-sm">
+              <div className="w-10 h-10 bg-green-50 dark:bg-slate-700 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform text-green-500 shrink-0">
                 <span className="material-icons-round text-xl">devices</span>
               </div>
               <div>
-                <h3 className="font-bold text-slate-900 dark:text-white mb-1">Sync</h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400">Access everywhere</p>
+                <h3 className="font-bold text-slate-950 dark:text-white mb-1">Sync</h3>
+                <p className="text-xs text-slate-700 dark:text-slate-600">Access everywhere</p>
               </div>
             </div>
           </div>
